@@ -30,10 +30,10 @@ import io.nats.connector.Connector;
  * @author laugimethods
  *
  */
-public class SparkPubSubPluginTest {
+public class SparkPubPluginTest {
 
 	protected static JavaSparkContext sc;
-	protected static SparkPubSubPlugin sparkPlugin;
+	protected static SparkPubPlugin sparkPlugin;
 
     Logger logger = null;
 
@@ -48,7 +48,7 @@ public class SparkPubSubPluginTest {
         UnitTestUtilities.startDefaultServer();
         Thread.sleep(500);
 
-		sparkPlugin = new SparkPubSubPlugin();
+		sparkPlugin = new SparkPubPlugin();
 	}
 
 	/**
@@ -67,14 +67,14 @@ public class SparkPubSubPluginTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
-        System.setProperty(Connector.PLUGIN_CLASS, SparkPubSubPlugin.class.getName());
+        System.setProperty(Connector.PLUGIN_CLASS, SparkPubPlugin.class.getName());
 
         // Enable tracing for debugging as necessary.
         //System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.plugins.redis.RedisPubSubPlugin", "trace");
         //System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.plugins.redis.RedisPubSubPluginTest", "trace");
         //System.setProperty("org.slf4j.simpleLogger.log.io.nats.client", "trace");
 
-        logger = LoggerFactory.getLogger(SparkPubSubPlugin.class);
+        logger = LoggerFactory.getLogger(SparkPubPlugin.class);
 	}
 
 	/**
@@ -240,7 +240,7 @@ public class SparkPubSubPluginTest {
 //    	Connector c = new Connector();
         ExecutorService executor = Executors.newFixedThreadPool(1);
         
-        NatsSubscriber ns1 = new NatsSubscriber("ns1", SparkPubSubPlugin.subject, 3);
+        NatsSubscriber ns1 = new NatsSubscriber("ns1", SparkPubPlugin.subject, 3);
         
         // start the subsciber apps
         executor.execute(ns1);
@@ -270,7 +270,7 @@ public class SparkPubSubPluginTest {
     }
 
 	/**
-	 * Test method for {@link io.nats.connector.plugins.spark.SparkPubSubPlugin#onStartup(org.slf4j.Logger, io.nats.client.ConnectionFactory)}.
+	 * Test method for {@link io.nats.connector.plugins.spark.SparkPubPlugin#onStartup(org.slf4j.Logger, io.nats.client.ConnectionFactory)}.
 	 */
 	@Test
 	public void testOnStartup() {
@@ -282,7 +282,7 @@ public class SparkPubSubPluginTest {
     }
 	
 	/**
-	 * Test method for {@link io.nats.connector.plugins.spark.SparkPubSubPlugin#onNatsInitialized(io.nats.connector.plugin.NATSConnector)}.
+	 * Test method for {@link io.nats.connector.plugins.spark.SparkPubPlugin#onNatsInitialized(io.nats.connector.plugin.NATSConnector)}.
 	 */
 	@Test
 	public void testOnNatsInitialized() {
@@ -290,7 +290,7 @@ public class SparkPubSubPluginTest {
 	}
 
 	/**
-	 * Test method for {@link io.nats.connector.plugins.spark.SparkPubSubPlugin#onNATSMessage(io.nats.client.Message)}.
+	 * Test method for {@link io.nats.connector.plugins.spark.SparkPubPlugin#onNATSMessage(io.nats.client.Message)}.
 	 */
 	@Test
 	public void testOnNATSMessage() {
@@ -298,7 +298,7 @@ public class SparkPubSubPluginTest {
 	}
 
 	/**
-	 * Test method for {@link io.nats.connector.plugins.spark.SparkPubSubPlugin#onNATSEvent(io.nats.connector.plugin.NATSEvent, java.lang.String)}.
+	 * Test method for {@link io.nats.connector.plugins.spark.SparkPubPlugin#onNATSEvent(io.nats.connector.plugin.NATSEvent, java.lang.String)}.
 	 */
 	@Test
 	public void testOnNATSEvent() {
@@ -306,7 +306,7 @@ public class SparkPubSubPluginTest {
 	}
 
 	/**
-	 * Test method for {@link io.nats.connector.plugins.spark.SparkPubSubPlugin#onShutdown()}.
+	 * Test method for {@link io.nats.connector.plugins.spark.SparkPubPlugin#onShutdown()}.
 	 */
 	@Test
 	public void testOnShutdown() {

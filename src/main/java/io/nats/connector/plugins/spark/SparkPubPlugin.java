@@ -23,7 +23,7 @@ import io.nats.connector.plugin.NATSEvent;
  * @author laugimethods
  *
  */
-public class SparkPubSubPlugin implements NATSConnectorPlugin, Serializable {
+public class SparkPubPlugin implements NATSConnectorPlugin, Serializable {
 
 //    NATSConnector connector = null;
     private ConnectionFactory connectionFactory = null;
