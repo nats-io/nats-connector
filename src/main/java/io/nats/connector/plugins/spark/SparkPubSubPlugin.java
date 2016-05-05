@@ -29,7 +29,7 @@ public class SparkPubSubPlugin implements NATSConnectorPlugin, Serializable {
     NATSConnector connector = null;
     Logger logger = null;
     
-    String subject = "TEST";
+    public static String subject = "TEST";
 
     boolean trace = false;
 

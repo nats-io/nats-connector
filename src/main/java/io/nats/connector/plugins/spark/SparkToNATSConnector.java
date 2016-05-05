@@ -25,6 +25,11 @@ public class SparkToNATSConnector implements NATSConnector {
     private Properties          properties = null;
     private Logger              logger     = LoggerFactory.getLogger(SparkToNATSConnector.class);
     String              		configFile = null;
+    
+    private Object              runningLock = new Object();
+
+    private Object cleanupLock = new Object();
+    private boolean hasCleanedUp = false;
 
     // TODO eval - this for performance.  Is it necessary?
     private AtomicBoolean     isRunning   = new AtomicBoolean();
@@ -36,7 +41,8 @@ public class SparkToNATSConnector implements NATSConnector {
     {
 //        this.plugin = plugin;
         this.properties = getProperties();
-        setup();
+ 
+        process();
     }
 
     private Properties getProperties() throws Exception{
@@ -84,13 +90,78 @@ public class SparkToNATSConnector implements NATSConnector {
         logger.debug("Connected to NATS cluster.");
     }
     
+    public void process()
+    {
+        logger.debug("Setting up NATS Connector.");
+
+        boolean running = true;
+
+        try {
+            // connect to the NATS cluster
+            setup();
+        }
+        catch (Exception e) {
+            logger.error("Setup error: " + e.getMessage());
+            logger.debug("Exception: ", e);
+            cleanup();
+            return;
+        }
+
+        logger.info("The NATS Connector is running.");
+
+        isRunning.set(true);
+
+/*        while (running)
+        {
+            synchronized(runningLock)
+            {
+                try {
+                    runningLock.wait();
+                }
+                catch (InterruptedException e) {
+                    // As of java 1.6, Object.wait can be woken up spuriously,
+                    // so we need to check if we are still running.
+                }
+
+                running = isRunning.get();
+            }
+        }
+
+        cleanup();*/
+    } 
+    
+    public void cleanup()
+    {
+        synchronized (cleanupLock)
+        {
+            if (hasCleanedUp)
+                return;
+
+
+            logger.debug("Cleaning up.");
+
+            hasCleanedUp = true;
+        }
+
+        logger.debug("Cleaned up NATS Connector.");
+    }
+    
 	/* (non-Javadoc)
 	 * @see io.nats.connector.plugin.NATSConnector#shutdown()
 	 */
 	@Override
 	public void shutdown() {
-		// TODO Auto-generated method stub
+        if (isRunning.get() == false)
+            return;
 
+        logger.debug("NATS connector is shutting down.");
+
+        isRunning.set(false);
+
+        synchronized (runningLock)
+        {
+            runningLock.notify();
+        }
 	}
 
 	/* (non-Javadoc)
@@ -102,11 +173,12 @@ public class SparkToNATSConnector implements NATSConnector {
             return;
 
         try {
+        	logger.info("Publish Message " + message + " to " + connection);
             connection.publish(message);
         }
         catch (Exception ex) {
-//            logger.error("Exception publishing: " + ex.getMessage());
-//            logger.debug("Exception: " + ex);
+            logger.info("Exception publishing: " + ex.getMessage()); // error
+            logger.info("Exception: " + ex); // debug
         }
 	}
 
