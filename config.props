@@ -1,0 +1,1 @@
+io.nats.connector.plugin=io.nats.connector.plugins.test.NATSTestPlugin

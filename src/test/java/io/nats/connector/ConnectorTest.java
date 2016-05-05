@@ -33,7 +33,7 @@ public class ConnectorTest {
         Thread.sleep(500);
     }
 
-    @Test
+    //@Test
     public void testStartErrors() throws Exception {
 
         try {
@@ -100,7 +100,7 @@ public class ConnectorTest {
         new Connector().run();
     }
 
-    @Test
+    //@Test
     public void testConnectorReadFromURL() throws Exception {
         NATSUtilities.readFromUrl("http://google.com");
         try {
@@ -112,13 +112,13 @@ public class ConnectorTest {
         }
     }
 
-    @Test
+    //@Test
     public void testConnectorStart() throws Exception {
         System.setProperty(Connector.PLUGIN_CLASS, io.nats.connector.plugins.test.NATSTestPlugin.class.getName());
         new Connector().run();
     }
 
-    @Test
+    //@Test
     public void testConnectorStartFromMain() throws Exception {
 
         System.setProperty(Connector.PLUGIN_CLASS, io.nats.connector.plugins.test.NATSTestPlugin.class.getName());
@@ -145,7 +145,7 @@ public class ConnectorTest {
 
     }
 
-    @Test
+    //@Test
     public void testConnectorShutdown() throws Exception {
         System.setProperty(Connector.PLUGIN_CLASS, io.nats.connector.plugins.test.NATSTestPlugin.class.getName());
         Connector c = new Connector();
@@ -162,7 +162,7 @@ public class ConnectorTest {
         c.shutdown();
     }
 
-    @Test
+    //@Test
     public void testDisconnectReconnect() throws Exception {
 
         System.setProperty(Connector.PLUGIN_CLASS, io.nats.connector.plugins.test.NATSTestPlugin.class.getName());
@@ -190,7 +190,7 @@ public class ConnectorTest {
         c.run();
     }
 
-    @Test
+    //@Test
     public void testNoNATSServer() throws Exception {
 
         UnitTestUtilities.stopDefaultServer();
