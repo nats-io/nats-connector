@@ -3,19 +3,18 @@
  */
 package io.nats.connector.plugins.spark;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.spark.api.java.function.VoidFunction;
 import org.slf4j.Logger;
 
+import io.nats.client.Connection;
 import io.nats.client.ConnectionFactory;
 import io.nats.client.Message;
-import io.nats.connector.Connector;
 import io.nats.connector.plugin.NATSConnector;
 import io.nats.connector.plugin.NATSConnectorPlugin;
 import io.nats.connector.plugin.NATSEvent;
@@ -26,7 +25,11 @@ import io.nats.connector.plugin.NATSEvent;
  */
 public class SparkPubSubPlugin implements NATSConnectorPlugin, Serializable {
 
-    NATSConnector connector = null;
+//    NATSConnector connector = null;
+    private ConnectionFactory connectionFactory = null;
+    private Connection        connection        = null;
+    protected String          configFile = null;
+
     Logger logger = null;
     
     public static String subject = "TEST";
@@ -39,6 +42,8 @@ public class SparkPubSubPlugin implements NATSConnectorPlugin, Serializable {
 	@Override
 	public boolean onStartup(Logger logger, ConnectionFactory factory) {
         this.logger = logger;
+        
+        this.connectionFactory = factory;
 
         try {
  //           loadProperties();
@@ -57,18 +62,6 @@ public class SparkPubSubPlugin implements NATSConnectorPlugin, Serializable {
 	 */
 	@Override
 	public boolean onNatsInitialized(NATSConnector connector) {
-		logger.info("" + this + " is initialized with NATSConnector: " + connector);
-		
-        this.connector = connector;
-        try {
-//            connector.subscribe(subject);
-        }
-        catch (Exception e)
-        {
-            logger.error("NATS Subscription error", e);
-            return false;
-        }
-
         return true;
 	}
 
@@ -77,8 +70,7 @@ public class SparkPubSubPlugin implements NATSConnectorPlugin, Serializable {
 	 */
 	@Override
 	public void onNATSMessage(Message msg) {
-		// TODO Auto-generated method stub
-
+		throw new UnsupportedOperationException("The " + this.getClass() + " plugin CANNOT be used to connect NATS into Spark");
 	}
 
 	/* (non-Javadoc)
@@ -86,36 +78,7 @@ public class SparkPubSubPlugin implements NATSConnectorPlugin, Serializable {
 	 */
 	@Override
 	public void onNATSEvent(NATSEvent event, String message) {
-        // When a connection has been disconnected unexpectedly, NATS will
-        // try to reconnect.  Messages published during the reconnect will
-        // be buffered and resent, so there may be no need to do anything.
-        // Connection disconnected - close JEDIS, buffer messages?
-        // Reconnected - reconnect to JEDIS.
-        // Closed:  should handle elsewhere.
-        // Async error.  Notify, let admins handle these.
-        switch (event)
-        {
-            case ASYNC_ERROR:
-                logger.error("NATS Asynchronous error: " + message);
-                break;
-            case RECONNECTED:
-                logger.info("Reconnected to the NATS cluster: " + message);
-                // At this point, we may not have to do much.  Buffered NATS messages
-                // may be flushed. and we'll buffer and flush the Redis messages.
-                // Revisit this later if we need more buffering.
-                break;
-            case DISCONNECTED:
-                logger.info("Disconnected from the NATS cluster: " + message);
-                break;
-            case CLOSED:
-                logger.debug("NATS Event Connection Closed: " + message);
-                // shudown - if this is a result of shutdown elsewhere,
-                // there will be no effect.
- //               connector.shutdown();
-                break;
-            default:
-                logger.warn("Unknown NATS Event: " + message);
-        }
+		throw new UnsupportedOperationException("The " + this.getClass() + " plugin CANNOT be used to connect NATS into Spark");
 	}
 
 	/* (non-Javadoc)
@@ -123,6 +86,45 @@ public class SparkPubSubPlugin implements NATSConnectorPlugin, Serializable {
 	 */
 	@Override
 	public void onShutdown() {
+	}
+	
+	protected ConnectionFactory getConnectionFactory() throws Exception {
+		if (connectionFactory == null) {
+			connectionFactory = new ConnectionFactory(getProperties());
+		}
+		
+		return connectionFactory;
+	}
+
+    private Properties getProperties() throws Exception{
+
+        // add those from the VM.
+        Properties p = new Properties(System.getProperties());
+
+        if (configFile == null)
+            return p;
+
+        logger.debug("Loading properties from '" + configFile + '"');
+        FileInputStream in = new FileInputStream(configFile);
+        try {
+            p.load(in);
+        }
+        catch (Exception e) {
+            logger.error("Unable to load properties.", e);
+            throw e;
+        }
+        finally {
+            in.close();
+        }
+
+        return p;
+    }
+
+	protected Connection getConnection() throws Exception {
+		if (connection == null) {
+			connection = getConnectionFactory().createConnection();
+		}
+		return connection;
 	}
 	
 	VoidFunction<String> onSparkInput = new VoidFunction<String>() {
@@ -133,11 +135,7 @@ public class SparkPubSubPlugin implements NATSConnectorPlugin, Serializable {
 
 		@Override
 		public void call(String str) throws Exception {
-			System.out.println(this + " ::::: " + connector + " :::::::: " + str);
-			
-			if (connector == null) {
-				connector = new SparkToNATSConnector();
-			}
+			System.out.println(" :::::::: " + str);
 //			List<String> l = getSubjectsFromChannel(channelOrPattern);
 	        
 			Message natsMessage = new Message();
@@ -148,7 +146,7 @@ public class SparkPubSubPlugin implements NATSConnectorPlugin, Serializable {
 //	        for (String s : l) {
 	            natsMessage.setSubject(subject);
 	            // new Connector().publish(natsMessage);
-	            connector.publish(natsMessage);
+	            getConnection().publish(natsMessage);
 
 //	            logger.trace("Send Redis ({}) -> NATS ({})", channelOrPattern, s);
 //	        }
