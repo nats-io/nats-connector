@@ -248,7 +248,7 @@ public class SparkPubSubPluginTest {
 //        executor.execute(c);
        
         // wait for subscribers to be ready.
-//        ns1.waitUntilReady();
+        ns1.waitUntilReady();
 
         // let the connector start
         Thread.sleep(1000);
@@ -263,7 +263,7 @@ public class SparkPubSubPluginTest {
 		rdd.foreachAsync(sparkPlugin.onSparkInput);
 		
         // wait for the subscribers to complete.
-//        ns1.waitForCompletion();
+        ns1.waitForCompletion();
 		
         Thread.sleep(1000);
 //        c.shutdown();

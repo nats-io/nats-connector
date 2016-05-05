@@ -169,9 +169,11 @@ public class SparkToNATSConnector implements NATSConnector {
 	 */
 	@Override
 	public void publish(Message message) {
-        if (isRunning.get() == false)
+        if (isRunning.get() == false) {
+            logger.info("NATSConnector is not Running"); // error
             return;
-
+        }
+        
         try {
         	logger.info("Publish Message " + message + " to " + connection);
             connection.publish(message);
