@@ -33,7 +33,7 @@ import io.nats.connector.Connector;
 public class SparkPubPluginTest {
 
 	protected static JavaSparkContext sc;
-	protected static SparkPubPlugin sparkPlugin;
+	protected static SparkPubConnector sparkPlugin;
 
     Logger logger = null;
 
@@ -48,7 +48,8 @@ public class SparkPubPluginTest {
         UnitTestUtilities.startDefaultServer();
         Thread.sleep(500);
 
-		sparkPlugin = new SparkPubPlugin();
+		sparkPlugin = new SparkPubConnector();
+//		sparkPlugin.label = "ORG ORG";
 	}
 
 	/**
@@ -67,14 +68,14 @@ public class SparkPubPluginTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
-        System.setProperty(Connector.PLUGIN_CLASS, SparkPubPlugin.class.getName());
+        System.setProperty(Connector.PLUGIN_CLASS, SparkPubConnector.class.getName());
 
         // Enable tracing for debugging as necessary.
         //System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.plugins.redis.RedisPubSubPlugin", "trace");
         //System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.plugins.redis.RedisPubSubPluginTest", "trace");
         //System.setProperty("org.slf4j.simpleLogger.log.io.nats.client", "trace");
 
-        logger = LoggerFactory.getLogger(SparkPubPlugin.class);
+        logger = LoggerFactory.getLogger(SparkPubConnector.class);
 	}
 
 	/**
@@ -240,7 +241,7 @@ public class SparkPubPluginTest {
 //    	Connector c = new Connector();
         ExecutorService executor = Executors.newFixedThreadPool(1);
         
-        NatsSubscriber ns1 = new NatsSubscriber("ns1", SparkPubPlugin.subject, 3);
+        NatsSubscriber ns1 = new NatsSubscriber("ns1", SparkPubConnector.subject, 6);
         
         // start the subsciber apps
         executor.execute(ns1);
@@ -257,10 +258,13 @@ public class SparkPubPluginTest {
                 "data_1",
                 "data_2",
                 "data_3",
+                "data_4",
+                "data_5",
+                "data_6"
             }));
     	
 		rdd.foreach(sparkPlugin.onSparkInput);		
-		rdd.foreachAsync(sparkPlugin.onSparkInput);
+//		rdd.foreachAsync(sparkPlugin.onSparkInput);
 		
         // wait for the subscribers to complete.
         ns1.waitForCompletion();
@@ -270,7 +274,7 @@ public class SparkPubPluginTest {
     }
 
 	/**
-	 * Test method for {@link io.nats.connector.plugins.spark.SparkPubPlugin#onStartup(org.slf4j.Logger, io.nats.client.ConnectionFactory)}.
+	 * Test method for {@link io.nats.connector.plugins.spark.SparkPubConnector#onStartup(org.slf4j.Logger, io.nats.client.ConnectionFactory)}.
 	 */
 	@Test
 	public void testOnStartup() {
@@ -282,7 +286,7 @@ public class SparkPubPluginTest {
     }
 	
 	/**
-	 * Test method for {@link io.nats.connector.plugins.spark.SparkPubPlugin#onNatsInitialized(io.nats.connector.plugin.NATSConnector)}.
+	 * Test method for {@link io.nats.connector.plugins.spark.SparkPubConnector#onNatsInitialized(io.nats.connector.plugin.NATSConnector)}.
 	 */
 	@Test
 	public void testOnNatsInitialized() {
@@ -290,7 +294,7 @@ public class SparkPubPluginTest {
 	}
 
 	/**
-	 * Test method for {@link io.nats.connector.plugins.spark.SparkPubPlugin#onNATSMessage(io.nats.client.Message)}.
+	 * Test method for {@link io.nats.connector.plugins.spark.SparkPubConnector#onNATSMessage(io.nats.client.Message)}.
 	 */
 	@Test
 	public void testOnNATSMessage() {
@@ -298,7 +302,7 @@ public class SparkPubPluginTest {
 	}
 
 	/**
-	 * Test method for {@link io.nats.connector.plugins.spark.SparkPubPlugin#onNATSEvent(io.nats.connector.plugin.NATSEvent, java.lang.String)}.
+	 * Test method for {@link io.nats.connector.plugins.spark.SparkPubConnector#onNATSEvent(io.nats.connector.plugin.NATSEvent, java.lang.String)}.
 	 */
 	@Test
 	public void testOnNATSEvent() {
@@ -306,7 +310,7 @@ public class SparkPubPluginTest {
 	}
 
 	/**
-	 * Test method for {@link io.nats.connector.plugins.spark.SparkPubPlugin#onShutdown()}.
+	 * Test method for {@link io.nats.connector.plugins.spark.SparkPubConnector#onShutdown()}.
 	 */
 	@Test
 	public void testOnShutdown() {

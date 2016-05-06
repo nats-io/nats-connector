@@ -23,12 +23,21 @@ import io.nats.connector.plugin.NATSEvent;
  * @author laugimethods
  *
  */
-public class SparkPubPlugin implements NATSConnectorPlugin, Serializable {
+public class SparkPubConnector implements NATSConnectorPlugin, Serializable {
 
-//    NATSConnector connector = null;
-    private ConnectionFactory connectionFactory = null;
-    private Connection        connection        = null;
+/**
+	 * 
+	 */
+	public SparkPubConnector() {
+		super();
+		System.out.println("CREATE SparkPubConnector " + this);
+	}
+
+	//    NATSConnector connector = null;
+    protected ConnectionFactory connectionFactory = null;
+    protected Connection        connection        = null;
     protected String          configFile = null;
+    protected String 			configuration;
 
     Logger logger = null;
     
@@ -123,6 +132,7 @@ public class SparkPubPlugin implements NATSConnectorPlugin, Serializable {
 	protected Connection getConnection() throws Exception {
 		if (connection == null) {
 			connection = getConnectionFactory().createConnection();
+			System.out.println("CREATE CONNECTION: " + connection + " for " + this);
 		}
 		return connection;
 	}
