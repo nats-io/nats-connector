@@ -38,6 +38,7 @@ public class SparkPubConnector implements Serializable {
     protected Connection        connection        = null;
     protected String          configFile = null;
     protected String 			configuration;
+    protected Properties		properties;
 
     Logger logger = null;
     
@@ -53,28 +54,16 @@ public class SparkPubConnector implements Serializable {
 		return connectionFactory;
 	}
 
-    private Properties getProperties() throws Exception{
+    public void setProperties(Properties properties) {
+		this.properties = properties;
+	}
 
-        // add those from the VM.
-        Properties p = new Properties(System.getProperties());
+	private Properties getProperties(){
+    	if (properties == null) {
+    		properties = new Properties(System.getProperties());
+    	}
 
-        if (configFile == null)
-            return p;
-
-        logger.debug("Loading properties from '" + configFile + '"');
-        FileInputStream in = new FileInputStream(configFile);
-        try {
-            p.load(in);
-        }
-        catch (Exception e) {
-            logger.error("Unable to load properties.", e);
-            throw e;
-        }
-        finally {
-            in.close();
-        }
-
-        return p;
+    	return properties;
     }
 
 	protected Connection getConnection() throws Exception {
@@ -93,7 +82,7 @@ public class SparkPubConnector implements Serializable {
 
 		@Override
 		public void call(String str) throws Exception {
-			System.out.println(" :::::::: " + str);
+			System.out.println(properties + " :::::::: " + str);
 //			List<String> l = getSubjectsFromChannel(channelOrPattern);
 	        
 			Message natsMessage = new Message();

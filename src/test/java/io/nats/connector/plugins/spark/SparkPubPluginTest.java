@@ -6,6 +6,7 @@ package io.nats.connector.plugins.spark;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -49,6 +50,7 @@ public class SparkPubPluginTest {
         Thread.sleep(500);
 
 		sparkPlugin = new SparkPubConnector();
+//		sparkPlugin.properties = new Properties();
 //		sparkPlugin.label = "ORG ORG";
 	}
 
