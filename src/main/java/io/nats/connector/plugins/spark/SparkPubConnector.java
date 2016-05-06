@@ -22,7 +22,12 @@ import io.nats.client.Message;
  */
 public class SparkPubConnector implements Serializable {
 
-	public static final String DEFAULT_SUBJECT = "spark";
+	public static final String NATS_SUBJECTS = "nats_subjects";
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
     protected ConnectionFactory 	connectionFactory = null;
     protected Connection        	connection        = null;
@@ -35,7 +40,7 @@ public class SparkPubConnector implements Serializable {
 	 * @param properties
 	 * @param subjects
 	 */
-	public SparkPubConnector() {
+	protected SparkPubConnector() {
 		super();
 		logger.debug("CREATE SparkPubConnector: " + this);
 	}
@@ -44,7 +49,7 @@ public class SparkPubConnector implements Serializable {
 		super();
 		this.properties = properties;
 		this.subjects = Arrays.asList(subjects);
-		logger.debug("CREATE SparkPubConnector: " + this);
+		logger.debug("CREATE SparkPubConnector {} with properties '{}' and NATS subjects '{}'.", this, properties, subjects);
 	}
 
 	/**
@@ -53,7 +58,7 @@ public class SparkPubConnector implements Serializable {
 	public SparkPubConnector(Properties properties) {
 		super();
 		this.properties = properties;
-		logger.debug("CREATE SparkPubConnector: " + this);
+		logger.debug("CREATE SparkPubConnector {} with properties '{}'.", this, properties);
 	}
 
 	/**
@@ -62,6 +67,7 @@ public class SparkPubConnector implements Serializable {
 	public SparkPubConnector(String... subjects) {
 		super();
 		this.subjects = Arrays.asList(subjects);
+		logger.debug("CREATE SparkPubConnector {} with NATS subjects '{}'.", this, subjects);
 	}
 
 	private Properties getProperties(){
@@ -72,11 +78,15 @@ public class SparkPubConnector implements Serializable {
     	return properties;
     }
 
-	private Collection<String> getSubjects() {
-		if (subjects ==  null) {
-			final String subjectsStr = getProperties().getProperty("subjects", DEFAULT_SUBJECT);
+	private Collection<String> getSubjects() throws Exception {
+		if ((subjects ==  null) || (subjects.size() == 0)) {
+			final String subjectsStr = getProperties().getProperty(NATS_SUBJECTS);
+			if (subjectsStr == null) {
+				throw new Exception("SparkPubConnector needs at least one NATS Subject.");
+			}
 			final String[] subjectsArray = subjectsStr.split(",");
 			subjects = Arrays.asList(subjectsArray);
+			logger.debug("Subject provided by the Properties: '{}'", subjects);
 		}
 		return subjects;
 	}    		
@@ -120,5 +130,17 @@ public class SparkPubConnector implements Serializable {
 	        }
 		}
 	};
+	
+	public static VoidFunction<String> sendToNats(Properties properties, String... subjects) {
+		return new SparkPubConnector(properties, subjects).sendToNats;
+	}
+	
+	public static VoidFunction<String> sendToNats(Properties properties) {
+		return new SparkPubConnector(properties).sendToNats;
+	}
+	
+	public static VoidFunction<String> sendToNats(String... subjects) {
+		return new SparkPubConnector(subjects).sendToNats;
+	}
 
 }

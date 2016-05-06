@@ -7,6 +7,7 @@ import static org.junit.Assert.*;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -33,8 +34,9 @@ import io.nats.client.MessageHandler;
  */
 public class SparkPubPluginTest {
 
+	private static final String DEFAULT_SUBJECT = "spark";
+
 	protected static JavaSparkContext sc;
-	protected static SparkPubConnector sparkConnector;
 
     static Logger logger = null;
 
@@ -54,8 +56,6 @@ public class SparkPubPluginTest {
 
         UnitTestUtilities.startDefaultServer();
         Thread.sleep(500);
-
-		sparkConnector = new SparkPubConnector("spark", "sub1", "sub2");		
 	}
 
 	/**
@@ -232,42 +232,114 @@ public class SparkPubPluginTest {
         }
     }
 
-    @Test
-    public void testSparkToNats() throws Exception {   
-    	
-//    	Connector c = new Connector();
-        ExecutorService executor = Executors.newFixedThreadPool(1);
-        
-        NatsSubscriber ns1 = new NatsSubscriber("ns1", SparkPubConnector.DEFAULT_SUBJECT, 6);
-        
-        // start the subsciber apps
-        executor.execute(ns1);
-        
-//        executor.execute(c);
-       
-        // wait for subscribers to be ready.
-        ns1.waitUntilReady();
-
-        // let the connector start
-        Thread.sleep(1000);
-        
-    	JavaRDD<String> rdd = sc.parallelize(Arrays.asList(new String[] {
+	/**
+	 * @return
+	 */
+	protected List<String> getData() {
+		final List<String> data = Arrays.asList(new String[] {
                 "data_1",
                 "data_2",
                 "data_3",
                 "data_4",
                 "data_5",
                 "data_6"
-            }));
+            });
+		return data;
+	}
+
+	/**
+	 * @param data
+	 * @return
+	 */
+	protected NatsSubscriber getNatsSubscriber(final List<String> data, String subject) {
+		ExecutorService executor = Executors.newFixedThreadPool(1);
+        
+        NatsSubscriber ns1 = new NatsSubscriber("ns1", subject, data.size());
+        
+        // start the subscribers apps
+        executor.execute(ns1);
+       
+        // wait for subscribers to be ready.
+        ns1.waitUntilReady();
+		return ns1;
+	}
+
+    @Test
+    public void testSparkToNats() throws Exception {   
+    	final List<String> data = getData();
     	
+        NatsSubscriber ns1 = getNatsSubscriber(data, DEFAULT_SUBJECT);
+               
+		JavaRDD<String> rdd = sc.parallelize(data);
+    	
+    	SparkPubConnector sparkConnector = new SparkPubConnector("spark", "sub1", "sub2"); 
 		rdd.foreach(sparkConnector.sendToNats);		
-//		rdd.foreachAsync(sparkConnector.onSparkInput);
 		
         // wait for the subscribers to complete.
         ns1.waitForCompletion();
+    }
+
+    @Test
+    public void testAsyncSparkToNats() throws Exception {   
+    	final List<String> data = getData();
+   	
+        NatsSubscriber ns1 = getNatsSubscriber(data, DEFAULT_SUBJECT);
+        
+		JavaRDD<String> rdd = sc.parallelize(data);
+    	
+    	SparkPubConnector sparkConnector = new SparkPubConnector(DEFAULT_SUBJECT, "sub1", "sub2"); 
+		rdd.foreachAsync(sparkConnector.sendToNats);
 		
-        Thread.sleep(1000);
-//        c.shutdown();
+        // wait for the subscribers to complete.
+        ns1.waitForCompletion();
+    }
+
+    @Test
+    public void testStaticSparkToNatsNoSubjects() throws Exception {   
+    	final List<String> data = getData();
+                
+		JavaRDD<String> rdd = sc.parallelize(data);
+    	
+    	try {
+			rdd.foreach(SparkPubConnector.sendToNats());
+		} catch (Exception e) {
+			if (e.getMessage().contains("SparkPubConnector needs at least one NATS Subject"))
+				return;
+			else
+				throw e;
+		}	
+    	
+    	fail("An Exception(\"SparkPubConnector needs at least one Subject\") should have been raised.");
+    }
+
+    @Test
+    public void testStaticSparkToNatsWithSubjects() throws Exception {   
+    	final List<String> data = getData();
+    	
+        NatsSubscriber ns1 = getNatsSubscriber(data, DEFAULT_SUBJECT);
+                
+		JavaRDD<String> rdd = sc.parallelize(data);
+    	
+    	rdd.foreach(SparkPubConnector.sendToNats(DEFAULT_SUBJECT, "sub1", "sub2"));		
+		
+        // wait for the subscribers to complete.
+        ns1.waitForCompletion();
+    }
+
+    @Test
+    public void testStaticSparkToNatsWithProperties() throws Exception {   
+    	final List<String> data = getData();
+    	
+        NatsSubscriber ns1 = getNatsSubscriber(data, DEFAULT_SUBJECT);
+                
+		JavaRDD<String> rdd = sc.parallelize(data);
+    	
+    	final Properties properties = new Properties();
+    	properties.setProperty(SparkPubConnector.NATS_SUBJECTS, "sub1,"+DEFAULT_SUBJECT+", sub2");
+		rdd.foreach(SparkPubConnector.sendToNats(properties));		
+		
+        // wait for the subscribers to complete.
+        ns1.waitForCompletion();
     }
 
 	/**
