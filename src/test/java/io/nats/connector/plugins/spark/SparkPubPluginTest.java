@@ -347,11 +347,13 @@ public class SparkPubPluginTest {
 		JavaRDD<String> rdd = sc.parallelize(data);
     	
     	System.setProperty(SparkPubConnector.NATS_SUBJECTS, "sub1,"+DEFAULT_SUBJECT+" , sub2");
-    	rdd.foreach(SparkPubConnector.sendToNats());		
-		
-        // wait for the subscribers to complete.
-        ns1.waitForCompletion();
-        
-    	System.clearProperty(SparkPubConnector.NATS_SUBJECTS);
+    	
+    	try {
+			rdd.foreach(SparkPubConnector.sendToNats());
+			// wait for the subscribers to complete.
+			ns1.waitForCompletion();
+		} finally {
+			System.clearProperty(SparkPubConnector.NATS_SUBJECTS);
+		}		
     }
 }
