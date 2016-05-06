@@ -23,7 +23,7 @@ import io.nats.connector.plugin.NATSEvent;
  * @author laugimethods
  *
  */
-public class SparkPubConnector implements NATSConnectorPlugin, Serializable {
+public class SparkPubConnector implements Serializable {
 
 /**
 	 * 
@@ -44,58 +44,6 @@ public class SparkPubConnector implements NATSConnectorPlugin, Serializable {
     public static String subject = "TEST";
 
     boolean trace = false;
-
-	/* (non-Javadoc)
-	 * @see io.nats.connector.plugin.NATSConnectorPlugin#onStartup(org.slf4j.Logger, io.nats.client.ConnectionFactory)
-	 */
-	@Override
-	public boolean onStartup(Logger logger, ConnectionFactory factory) {
-        this.logger = logger;
-        
-        this.connectionFactory = factory;
-
-        try {
- //           loadProperties();
- //           loadConfig();
-        }
-        catch (Exception e) {
-            logger.error("Unable to initialize.", e);
-            return false;
-        }
-
-        return true;
-	}
-
-	/* (non-Javadoc)
-	 * @see io.nats.connector.plugin.NATSConnectorPlugin#onNatsInitialized(io.nats.connector.plugin.NATSConnector)
-	 */
-	@Override
-	public boolean onNatsInitialized(NATSConnector connector) {
-        return true;
-	}
-
-	/* (non-Javadoc)
-	 * @see io.nats.connector.plugin.NATSConnectorPlugin#onNATSMessage(io.nats.client.Message)
-	 */
-	@Override
-	public void onNATSMessage(Message msg) {
-		throw new UnsupportedOperationException("The " + this.getClass() + " plugin CANNOT be used to connect NATS into Spark");
-	}
-
-	/* (non-Javadoc)
-	 * @see io.nats.connector.plugin.NATSConnectorPlugin#onNATSEvent(io.nats.connector.plugin.NATSEvent, java.lang.String)
-	 */
-	@Override
-	public void onNATSEvent(NATSEvent event, String message) {
-		throw new UnsupportedOperationException("The " + this.getClass() + " plugin CANNOT be used to connect NATS into Spark");
-	}
-
-	/* (non-Javadoc)
-	 * @see io.nats.connector.plugin.NATSConnectorPlugin#onShutdown()
-	 */
-	@Override
-	public void onShutdown() {
-	}
 	
 	protected ConnectionFactory getConnectionFactory() throws Exception {
 		if (connectionFactory == null) {
