@@ -5,7 +5,6 @@ package io.nats.connector.plugins.spark;
 
 import static org.junit.Assert.*;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -55,7 +54,6 @@ public class SparkPubPluginTest {
 		sc = new JavaSparkContext(sparkConf);
 
         UnitTestUtilities.startDefaultServer();
-        Thread.sleep(500);
 	}
 
 	/**
@@ -64,8 +62,6 @@ public class SparkPubPluginTest {
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
         UnitTestUtilities.stopDefaultServer();
-        Thread.sleep(500);
-
         sc.stop();
 	}
 

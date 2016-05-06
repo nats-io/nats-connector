@@ -41,7 +41,7 @@ public class SparkPubConnector implements Serializable {
 	 * @param properties
 	 * @param subjects
 	 */
-	protected SparkPubConnector() {
+    public SparkPubConnector() {
 		super();
 		logger.debug("CREATE SparkPubConnector: " + this);
 	}
@@ -75,7 +75,6 @@ public class SparkPubConnector implements Serializable {
     	if (properties == null) {
     		properties = new Properties(System.getProperties());
     	}
-
     	return properties;
     }
 
@@ -107,12 +106,11 @@ public class SparkPubConnector implements Serializable {
 	protected ConnectionFactory getConnectionFactory() throws Exception {
 		if (connectionFactory == null) {
 			connectionFactory = new ConnectionFactory(getProperties());
-		}
-		
+		}		
 		return connectionFactory;
 	}
 
-	// A dedicated lock object would not be serializable... KISS.
+	// A dedicated lock object would not be serializable... So, KISS.
 	protected synchronized Connection getConnection() throws Exception {
 		if (connection == null) {
 			connection = getConnectionFactory().createConnection();
