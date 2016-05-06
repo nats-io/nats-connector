@@ -49,7 +49,7 @@ public class SparkPubPluginTest {
         UnitTestUtilities.startDefaultServer();
         Thread.sleep(500);
 
-		sparkPlugin = new SparkPubConnector();
+		sparkPlugin = new SparkPubConnector("spark", "sub1", "sub2");
 //		sparkPlugin.properties = new Properties();
 //		sparkPlugin.label = "ORG ORG";
 	}
@@ -243,7 +243,7 @@ public class SparkPubPluginTest {
 //    	Connector c = new Connector();
         ExecutorService executor = Executors.newFixedThreadPool(1);
         
-        NatsSubscriber ns1 = new NatsSubscriber("ns1", SparkPubConnector.subject, 6);
+        NatsSubscriber ns1 = new NatsSubscriber("ns1", SparkPubConnector.DEFAULT_SUBJECT, 6);
         
         // start the subsciber apps
         executor.execute(ns1);
