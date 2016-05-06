@@ -10,6 +10,7 @@ import java.util.Properties;
 
 import org.apache.spark.api.java.function.VoidFunction;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.nats.client.Connection;
 import io.nats.client.ConnectionFactory;
@@ -23,15 +24,16 @@ public class SparkPubConnector implements Serializable {
 
 	public static final String DEFAULT_SUBJECT = "spark";
 
-    protected ConnectionFactory connectionFactory = null;
-    protected Connection        connection        = null;
-    protected Properties		properties		  = null;
-    protected Collection<String>		subjects;
+    protected ConnectionFactory 	connectionFactory = null;
+    protected Connection        	connection        = null;
+    protected Properties			properties		  = null;
+    protected Collection<String>	subjects;
 
-    Logger logger = null;
+    static final Logger logger = LoggerFactory.getLogger(SparkPubConnector.class);
     
     /**
-	 * 
+	 * @param properties
+	 * @param subjects
 	 */
 	public SparkPubConnector() {
 		super();
@@ -60,12 +62,6 @@ public class SparkPubConnector implements Serializable {
 		this.subjects = Arrays.asList(subjects);
 	}
 
-	boolean trace = false;
-
-    public void setProperties(Properties properties) {
-		this.properties = properties;
-	}
-
 	private Properties getProperties(){
     	if (properties == null) {
     		properties = new Properties(System.getProperties());
@@ -76,8 +72,8 @@ public class SparkPubConnector implements Serializable {
 
 	private Collection<String> getSubjects() {
 		if (subjects ==  null) {
-			String subjectsStr = getProperties().getProperty("subjects", DEFAULT_SUBJECT);
-			String[] subjectsArray = subjectsStr.split(",");
+			final String subjectsStr = getProperties().getProperty("subjects", DEFAULT_SUBJECT);
+			final String[] subjectsArray = subjectsStr.split(",");
 			subjects = Arrays.asList(subjectsArray);
 		}
 		return subjects;
@@ -107,20 +103,16 @@ public class SparkPubConnector implements Serializable {
 
 		@Override
 		public void call(String str) throws Exception {
-			System.out.println(properties + " :::::::: " + str);
-//			List<String> l = getSubjectsFromChannel(channelOrPattern);
-	        
 			Message natsMessage = new Message();
 			
 			byte[] payload = str.getBytes();
 	        natsMessage.setData(payload, 0, payload.length);
 	        
-	        for (String s : getSubjects()) {
-	            natsMessage.setSubject(s);
-	            // new Connector().publish(natsMessage);
+	        for (String subject : getSubjects()) {
+	            natsMessage.setSubject(subject);
 	            getConnection().publish(natsMessage);
 
-//	            logger.trace("Send Redis ({}) -> NATS ({})", channelOrPattern, s);
+	            logger.info("Send Spark ({}) -> NATS ({})", str, subject);
 	        }
 		}
 	};
