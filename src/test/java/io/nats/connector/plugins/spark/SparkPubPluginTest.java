@@ -335,55 +335,10 @@ public class SparkPubPluginTest {
 		JavaRDD<String> rdd = sc.parallelize(data);
     	
     	final Properties properties = new Properties();
-    	properties.setProperty(SparkPubConnector.NATS_SUBJECTS, "sub1,"+DEFAULT_SUBJECT+", sub2");
+    	properties.setProperty(SparkPubConnector.NATS_SUBJECTS, "sub1,"+DEFAULT_SUBJECT+" , sub2");
 		rdd.foreach(SparkPubConnector.sendToNats(properties));		
 		
         // wait for the subscribers to complete.
         ns1.waitForCompletion();
     }
-
-	/**
-	 * Test method for {@link io.nats.connector.plugins.spark.SparkPubConnector#onStartup(org.slf4j.Logger, io.nats.client.ConnectionFactory)}.
-	 */
-	@Test
-	public void testOnStartup() {
-//		fail("Not yet implemented");
-	}
-
-    @Test
-    public void testNatsToSpark() throws Exception {
-    }
-	
-	/**
-	 * Test method for {@link io.nats.connector.plugins.spark.SparkPubConnector#onNatsInitialized(io.nats.connector.plugin.NATSConnector)}.
-	 */
-	@Test
-	public void testOnNatsInitialized() {
-//		fail("Not yet implemented");
-	}
-
-	/**
-	 * Test method for {@link io.nats.connector.plugins.spark.SparkPubConnector#onNATSMessage(io.nats.client.Message)}.
-	 */
-	@Test
-	public void testOnNATSMessage() {
-//		fail("Not yet implemented");
-	}
-
-	/**
-	 * Test method for {@link io.nats.connector.plugins.spark.SparkPubConnector#onNATSEvent(io.nats.connector.plugin.NATSEvent, java.lang.String)}.
-	 */
-	@Test
-	public void testOnNATSEvent() {
-//		fail("Not yet implemented");
-	}
-
-	/**
-	 * Test method for {@link io.nats.connector.plugins.spark.SparkPubConnector#onShutdown()}.
-	 */
-	@Test
-	public void testOnShutdown() {
-//		fail("Not yet implemented");
-	}
-
 }

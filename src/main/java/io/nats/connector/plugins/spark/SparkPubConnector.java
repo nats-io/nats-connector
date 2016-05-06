@@ -4,8 +4,10 @@
 package io.nats.connector.plugins.spark;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.spark.api.java.function.VoidFunction;
@@ -48,7 +50,7 @@ public class SparkPubConnector implements Serializable {
     public SparkPubConnector(Properties properties, String... subjects) {
 		super();
 		this.properties = properties;
-		this.subjects = Arrays.asList(subjects);
+		this.subjects = transformIntoAList(subjects);
 		logger.debug("CREATE SparkPubConnector {} with properties '{}' and NATS subjects '{}'.", this, properties, subjects);
 	}
 
@@ -66,7 +68,7 @@ public class SparkPubConnector implements Serializable {
 	 */
 	public SparkPubConnector(String... subjects) {
 		super();
-		this.subjects = Arrays.asList(subjects);
+		this.subjects = transformIntoAList(subjects);
 		logger.debug("CREATE SparkPubConnector {} with NATS subjects '{}'.", this, subjects);
 	}
 
@@ -85,11 +87,23 @@ public class SparkPubConnector implements Serializable {
 				throw new Exception("SparkPubConnector needs at least one NATS Subject.");
 			}
 			final String[] subjectsArray = subjectsStr.split(",");
-			subjects = Arrays.asList(subjectsArray);
+			subjects = transformIntoAList(subjectsArray);
 			logger.debug("Subject provided by the Properties: '{}'", subjects);
 		}
 		return subjects;
 	}    		
+
+	/**
+	 * @param subjects
+	 * @return
+	 */
+	protected List<String> transformIntoAList(String... subjects) {
+		ArrayList<String> list = new ArrayList<String>(subjects.length);
+		for (String subject: subjects){
+			list.add(subject.trim());
+		}
+		return list;
+	}
 	
 	protected ConnectionFactory getConnectionFactory() throws Exception {
 		if (connectionFactory == null) {
