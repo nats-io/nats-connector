@@ -5,7 +5,6 @@ package io.nats.connector.plugins.spark;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
@@ -24,7 +23,7 @@ import io.nats.client.Message;
  */
 public class SparkPubConnector implements Serializable {
 
-	public static final String NATS_SUBJECTS = "nats_subjects";
+	public static final String NATS_SUBJECTS = "nats.io.connector.spark.subjects";
 
 	/**
 	 * 
@@ -51,7 +50,7 @@ public class SparkPubConnector implements Serializable {
 		super();
 		this.properties = properties;
 		this.subjects = transformIntoAList(subjects);
-		logger.debug("CREATE SparkPubConnector {} with properties '{}' and NATS subjects '{}'.", this, properties, subjects);
+		logger.debug("CREATE SparkPubConnector {} with Properties '{}' and NATS Subjects '{}'.", this, properties, subjects);
 	}
 
 	/**
@@ -60,7 +59,7 @@ public class SparkPubConnector implements Serializable {
 	public SparkPubConnector(Properties properties) {
 		super();
 		this.properties = properties;
-		logger.debug("CREATE SparkPubConnector {} with properties '{}'.", this, properties);
+		logger.debug("CREATE SparkPubConnector {} with Properties '{}'.", this, properties);
 	}
 
 	/**
@@ -69,7 +68,7 @@ public class SparkPubConnector implements Serializable {
 	public SparkPubConnector(String... subjects) {
 		super();
 		this.subjects = transformIntoAList(subjects);
-		logger.debug("CREATE SparkPubConnector {} with NATS subjects '{}'.", this, subjects);
+		logger.debug("CREATE SparkPubConnector {} with NATS Subjects '{}'.", this, subjects);
 	}
 
 	private Properties getProperties(){

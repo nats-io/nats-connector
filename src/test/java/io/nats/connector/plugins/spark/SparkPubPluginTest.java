@@ -341,4 +341,21 @@ public class SparkPubPluginTest {
         // wait for the subscribers to complete.
         ns1.waitForCompletion();
     }
+
+    @Test
+    public void testStaticSparkToNatsWithSystemProperties() throws Exception {   
+    	final List<String> data = getData();
+    	
+        NatsSubscriber ns1 = getNatsSubscriber(data, DEFAULT_SUBJECT);
+                
+		JavaRDD<String> rdd = sc.parallelize(data);
+    	
+    	System.setProperty(SparkPubConnector.NATS_SUBJECTS, "sub1,"+DEFAULT_SUBJECT+" , sub2");
+    	rdd.foreach(SparkPubConnector.sendToNats());		
+		
+        // wait for the subscribers to complete.
+        ns1.waitForCompletion();
+        
+    	System.clearProperty(SparkPubConnector.NATS_SUBJECTS);
+    }
 }
