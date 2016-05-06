@@ -37,13 +37,14 @@ public class SparkPubConnector implements Serializable {
 	 */
 	public SparkPubConnector() {
 		super();
-		System.out.println("CREATE SparkPubConnector " + this);
+		logger.debug("CREATE SparkPubConnector: " + this);
 	}
 
     public SparkPubConnector(Properties properties, String... subjects) {
 		super();
 		this.properties = properties;
 		this.subjects = Arrays.asList(subjects);
+		logger.debug("CREATE SparkPubConnector: " + this);
 	}
 
 	/**
@@ -52,6 +53,7 @@ public class SparkPubConnector implements Serializable {
 	public SparkPubConnector(Properties properties) {
 		super();
 		this.properties = properties;
+		logger.debug("CREATE SparkPubConnector: " + this);
 	}
 
 	/**
@@ -87,11 +89,11 @@ public class SparkPubConnector implements Serializable {
 		return connectionFactory;
 	}
 
-	// A dedicated lock object would not be serializable...
+	// A dedicated lock object would not be serializable... KISS.
 	protected synchronized Connection getConnection() throws Exception {
 		if (connection == null) {
 			connection = getConnectionFactory().createConnection();
-			logger.info("CREATE CONNECTION: {} for {}", connection, this);
+			logger.debug("A NATS Connection {} has been created for {}", connection, this);
 		}
 		return connection;
 	}
@@ -114,7 +116,7 @@ public class SparkPubConnector implements Serializable {
 	            natsMessage.setSubject(subject);
 				localConnection.publish(natsMessage);
 
-	            logger.trace("Send Spark ({}) -> NATS ({})", str, subject);
+	            logger.trace("Send '{}' from Spark to NATS ({})", str, subject);
 	        }
 		}
 	};

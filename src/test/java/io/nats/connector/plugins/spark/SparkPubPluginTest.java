@@ -5,6 +5,7 @@ package io.nats.connector.plugins.spark;
 
 import static org.junit.Assert.*;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
@@ -25,7 +26,6 @@ import io.nats.client.AsyncSubscription;
 import io.nats.client.ConnectionFactory;
 import io.nats.client.Message;
 import io.nats.client.MessageHandler;
-import io.nats.connector.Connector;
 
 /**
  * @author laugimethods
@@ -36,22 +36,26 @@ public class SparkPubPluginTest {
 	protected static JavaSparkContext sc;
 	protected static SparkPubConnector sparkConnector;
 
-    Logger logger = null;
+    static Logger logger = null;
 
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		SparkConf sparkConf = new SparkConf().setAppName("My Spark Job").setMaster("local[2]");
+        // Enable tracing for debugging as necessary.
+        System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.plugins.spark.SparkPubConnector", "trace");
+        System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.plugins.spark.SparkPubPluginTest", "debug");
+
+        logger = LoggerFactory.getLogger(SparkPubConnector.class);       
+
+        SparkConf sparkConf = new SparkConf().setAppName("My Spark Job").setMaster("local[2]");
 		sc = new JavaSparkContext(sparkConf);
 
         UnitTestUtilities.startDefaultServer();
         Thread.sleep(500);
 
-		sparkConnector = new SparkPubConnector("spark", "sub1", "sub2");
-//		sparkConnector.properties = new Properties();
-//		sparkConnector.label = "ORG ORG";
+		sparkConnector = new SparkPubConnector("spark", "sub1", "sub2");		
 	}
 
 	/**
@@ -70,12 +74,8 @@ public class SparkPubPluginTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
-        // Enable tracing for debugging as necessary.
-        //System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.plugins.redis.RedisPubSubPlugin", "trace");
-        //System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.plugins.redis.RedisPubSubPluginTest", "trace");
-        //System.setProperty("org.slf4j.simpleLogger.log.io.nats.client", "trace");
-
-        logger = LoggerFactory.getLogger(SparkPubConnector.class);
+		assertTrue(logger.isDebugEnabled());
+		assertTrue(LoggerFactory.getLogger(SparkPubConnector.class).isTraceEnabled());
 	}
 
 	/**
@@ -84,6 +84,7 @@ public class SparkPubPluginTest {
 	@After
 	public void tearDown() throws Exception {
 	}
+	
     abstract class TestClient
     {
         Object readyLock = new Object();
@@ -221,11 +222,7 @@ public class SparkPubPluginTest {
 
             String value = new String (message.getData());
 
-            logger.info("NATS Subscriber ({}):  Received message: {}", id, value);
-
-/*            if (checkPayload) {
-                org.junit.Assert.assertTrue(REDIS_PAYLOAD.equals(value));
-            }*/
+            logger.debug("NATS Subscriber ({}):  Received message: {}", id, value);
 
             if (tallyMessage() == testCount)
             {
