@@ -34,7 +34,7 @@ import io.nats.connector.Connector;
 public class SparkPubPluginTest {
 
 	protected static JavaSparkContext sc;
-	protected static SparkPubConnector sparkPlugin;
+	protected static SparkPubConnector sparkConnector;
 
     Logger logger = null;
 
@@ -49,9 +49,9 @@ public class SparkPubPluginTest {
         UnitTestUtilities.startDefaultServer();
         Thread.sleep(500);
 
-		sparkPlugin = new SparkPubConnector("spark", "sub1", "sub2");
-//		sparkPlugin.properties = new Properties();
-//		sparkPlugin.label = "ORG ORG";
+		sparkConnector = new SparkPubConnector("spark", "sub1", "sub2");
+//		sparkConnector.properties = new Properties();
+//		sparkConnector.label = "ORG ORG";
 	}
 
 	/**
@@ -70,8 +70,6 @@ public class SparkPubPluginTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
-        System.setProperty(Connector.PLUGIN_CLASS, SparkPubConnector.class.getName());
-
         // Enable tracing for debugging as necessary.
         //System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.plugins.redis.RedisPubSubPlugin", "trace");
         //System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.plugins.redis.RedisPubSubPluginTest", "trace");
@@ -265,8 +263,8 @@ public class SparkPubPluginTest {
                 "data_6"
             }));
     	
-		rdd.foreach(sparkPlugin.onSparkInput);		
-//		rdd.foreachAsync(sparkPlugin.onSparkInput);
+		rdd.foreach(sparkConnector.sendToNats);		
+//		rdd.foreachAsync(sparkConnector.onSparkInput);
 		
         // wait for the subscribers to complete.
         ns1.waitForCompletion();

@@ -95,7 +95,7 @@ public class SparkPubConnector implements Serializable {
 		return connection;
 	}
 	
-	VoidFunction<String> onSparkInput = new VoidFunction<String>() {
+	VoidFunction<String> sendToNats = new VoidFunction<String>() {
 		/**
 		 * 
 		 */
