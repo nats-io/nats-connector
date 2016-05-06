@@ -87,10 +87,11 @@ public class SparkPubConnector implements Serializable {
 		return connectionFactory;
 	}
 
-	protected Connection getConnection() throws Exception {
+	// A dedicated lock object would not be serializable...
+	protected synchronized Connection getConnection() throws Exception {
 		if (connection == null) {
 			connection = getConnectionFactory().createConnection();
-			System.out.println("CREATE CONNECTION: " + connection + " for " + this);
+			logger.info("CREATE CONNECTION: {} for {}", connection, this);
 		}
 		return connection;
 	}
@@ -108,11 +109,12 @@ public class SparkPubConnector implements Serializable {
 			byte[] payload = str.getBytes();
 	        natsMessage.setData(payload, 0, payload.length);
 	        
+            final Connection localConnection = getConnection();
 	        for (String subject : getSubjects()) {
 	            natsMessage.setSubject(subject);
-	            getConnection().publish(natsMessage);
+				localConnection.publish(natsMessage);
 
-	            logger.info("Send Spark ({}) -> NATS ({})", str, subject);
+	            logger.trace("Send Spark ({}) -> NATS ({})", str, subject);
 	        }
 		}
 	};
