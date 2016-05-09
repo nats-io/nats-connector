@@ -35,9 +35,7 @@ import io.nats.connector.spark.SparkToNatsConnector;
 public class SparkToNatsConnectorTest {
 
 	private static final String DEFAULT_SUBJECT = "spark";
-
 	protected static JavaSparkContext sc;
-
     static Logger logger = null;
 
 	/**
@@ -50,7 +48,7 @@ public class SparkToNatsConnectorTest {
         System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.spark.SparkToNatsConnectorTest", "debug");
         System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.spark.TestClient", "debug");
 
-        logger = LoggerFactory.getLogger(SparkToNatsConnector.class);       
+        logger = LoggerFactory.getLogger(SparkToNatsConnectorTest.class);       
 
         SparkConf sparkConf = new SparkConf().setAppName("My Spark Job").setMaster("local[2]");
 		sc = new JavaSparkContext(sparkConf);
