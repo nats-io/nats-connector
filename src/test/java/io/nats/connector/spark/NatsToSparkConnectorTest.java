@@ -27,6 +27,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.nats.connector.spark.NatsToSparkConnector;
 
 public class NatsToSparkConnectorTest {
 
@@ -91,11 +92,11 @@ public class NatsToSparkConnectorTest {
 		JavaStreamingContext ssc = new JavaStreamingContext(sc, new Duration(200));
 
 		final JavaReceiverInputDStream<String> messages = ssc.receiverStream(
-				new NatsToSparkConnector(null, 0, "Subject", "Subject", StorageLevel.MEMORY_ONLY()));
+				new NatsToSparkConnector(null, 0, "Subject", "Group", StorageLevel.MEMORY_ONLY()));
 
 		ExecutorService executor = Executors.newFixedThreadPool(6);
 
-		NatsPublisher   np = new NatsPublisher("np", "Subject",  nbOfMessages);
+		NatsPublisher np = new NatsPublisher("np", "Subject",  nbOfMessages);
 		
 		messages.print();
 		

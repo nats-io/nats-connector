@@ -24,8 +24,8 @@ import io.nats.client.Message;
 /**
  * A Spark to NATS connector.
  * <p>
- * It provides a VoidFunction&lt;String&gt; method that can be used as follow:
- * <pre>rdd.foreach(SparkToNatsConnector.publishToNats());</pre>
+ * It provides a VoidFunction&lt;String&gt; method that can be called as follow:
+ * <pre>rdd.foreach(SparkToNatsConnector.publishToNats( ... ));</pre>
  */
 public class SparkToNatsConnector implements Serializable {
 
@@ -149,7 +149,7 @@ public class SparkToNatsConnector implements Serializable {
 	};
 
 	/**
-	 * Will publish the Strings provided by Spark into NATS.
+	 * Will publish the Strings provided (by Spark) into NATS.
 	 *
 	 * @param properties Defines the properties of the connection to NATS.
 	 * @param subjects The list of NATS subjects to publish to.
@@ -159,7 +159,7 @@ public class SparkToNatsConnector implements Serializable {
 	}
 
 	/**
-	 * Will publish the Strings provided by Spark into NATS.
+	 * Will publish the Strings provided (by Spark) into NATS.
 	 * The list of the NATS subjects (separated by ',') needs to be provided by the nats.io.connector.spark.subjects property.
 	 *
 	 * @param properties Defines the properties of the connection to NATS.
@@ -169,7 +169,7 @@ public class SparkToNatsConnector implements Serializable {
 	}
 
 	/**
-	 * Will publish the Strings provided by Spark into NATS.
+	 * Will publish the Strings provided (by Spark) into NATS.
 	 * The settings of the NATS connection can be defined thanks to the System properties.
 	 *
 	 * @param subjects The list of NATS subjects to publish to.

@@ -8,6 +8,7 @@
 package io.nats.connector.spark;
 
 import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.spark.storage.StorageLevel;
@@ -19,19 +20,32 @@ import io.nats.client.Connection;
 import io.nats.client.ConnectionFactory;
 import io.nats.client.Subscription;
 
+/**
+ * A NATS to Spark Connector.
+ * <p>
+ * It will transfer messages received from NATS into Spark data.
+ * <p>
+ * That class extends {@link org.apache.spark.streaming.receiver.Receiver}&lt;String&gt;.
+ * <p>
+ * An usage of this class would look like this.
+ * <pre>
+ * JavaStreamingContext ssc = new JavaStreamingContext(sc, new Duration(2000));
+ * final JavaReceiverInputDStream&lt;String&gt; messages = ssc.receiverStream(
+ *    new NatsToSparkConnector(null, 0, "Subject", "Group", StorageLevel.MEMORY_ONLY()));
+ * </pre>
+ * @see <a href="http://spark.apache.org/docs/1.6.1/streaming-custom-receivers.html">Spark Streaming Custom Receivers</a>
+ */
 public class NatsToSparkConnector extends Receiver<String> {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 6989127121049901119L;
+
+	static final Logger logger = LoggerFactory.getLogger(NatsToSparkConnector.class);
+
 	String host = null;
 	int port = -1;	 
 	String subject;
 	String qgroup;
 	String url;
-
-	static final Logger logger = LoggerFactory.getLogger(NatsToSparkConnector.class);
 			
 	public NatsToSparkConnector(String host_ , int port_, String _subject, String _qgroup, StorageLevel _storageLevel) {
 		super(_storageLevel);
@@ -54,6 +68,7 @@ public class NatsToSparkConnector extends Receiver<String> {
 		super(_storageLevel);
 	}
 
+	@Override
 	public void onStart() {
 		//Start the thread that receives data over a connection
 		new Thread()  {
@@ -67,16 +82,19 @@ public class NatsToSparkConnector extends Receiver<String> {
 		}.start();
 	}
 
+	@Override
 	public void onStop() {
 		// There is nothing much to do as the thread calling receive()
-		// is designed to stop by itself if isStopped() returns false
+		// is designed to stop by itself if CTRL-C is Caught.
 	}
 
-	/** Create a socket connection and receive data until receiver is stopped */
-	private void receive() throws Exception{
+	/** Create a socket connection and receive data until receiver is stopped 
+	 * @throws TimeoutException 
+	 * @throws IOException */
+	protected void receive() {
 
-		// Make connection and initialize streams			  
 		try {
+			// Make connection and initialize streams			  
 			ConnectionFactory cf = new ConnectionFactory(url);
 			final Connection nc = cf.createConnection();
 			AtomicInteger count = new AtomicInteger();
@@ -90,7 +108,7 @@ public class NatsToSparkConnector extends Receiver<String> {
 
 			logger.info("Listening on {}.", subject);
 			Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-				logger.error("Caught CTRL-C, shutting down gracefully...");
+				logger.info("Caught CTRL-C, shutting down gracefully...");
 				try {
 					sub.unsubscribe();
 				} catch (IOException e) {
@@ -98,14 +116,9 @@ public class NatsToSparkConnector extends Receiver<String> {
 				}
 				nc.close();
 			}));
-
-			while (true) {
-				// loop forever
-				Thread.yield();
-			}
-		} catch (Exception e) {
+		} catch (IOException | TimeoutException e) {
 			logger.error(e.getLocalizedMessage());
-		}			        				
+		}
 	}
 }
 
