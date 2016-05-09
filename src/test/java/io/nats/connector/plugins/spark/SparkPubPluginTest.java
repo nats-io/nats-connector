@@ -1,6 +1,10 @@
-/**
- * 
- */
+/*******************************************************************************
+ * Copyright (c) 2016 Logimethods
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the MIT License (MIT)
+ * which accompanies this distribution, and is available at
+ * http://opensource.org/licenses/MIT
+ *******************************************************************************/
 package io.nats.connector.plugins.spark;
 
 import static org.junit.Assert.*;
@@ -27,10 +31,6 @@ import io.nats.client.ConnectionFactory;
 import io.nats.client.Message;
 import io.nats.client.MessageHandler;
 
-/**
- * @author laugimethods
- *
- */
 public class SparkPubPluginTest {
 
 	private static final String DEFAULT_SUBJECT = "spark";

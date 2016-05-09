@@ -1,6 +1,10 @@
-/**
- * 
- */
+/*******************************************************************************
+ * Copyright (c) 2016 Logimethods
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the MIT License (MIT)
+ * which accompanies this distribution, and is available at
+ * http://opensource.org/licenses/MIT
+ *******************************************************************************/
 package io.nats.connector.plugins.spark;
 
 import java.io.Serializable;
@@ -17,10 +21,6 @@ import io.nats.client.Connection;
 import io.nats.client.ConnectionFactory;
 import io.nats.client.Message;
 
-/**
- * @author laugimethods
- *
- */
 public class SparkPubConnector implements Serializable {
 
 	public static final String NATS_SUBJECTS = "nats.io.connector.spark.subjects";
