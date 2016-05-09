@@ -261,36 +261,6 @@ public class SparkPubPluginTest {
 	}
 
     @Test
-    public void testSparkToNats() throws Exception {   
-    	final List<String> data = getData();
-    	
-        NatsSubscriber ns1 = getNatsSubscriber(data, DEFAULT_SUBJECT);
-               
-		JavaRDD<String> rdd = sc.parallelize(data);
-    	
-    	SparkPubConnector sparkConnector = new SparkPubConnector("spark", "sub1", "sub2"); 
-		rdd.foreach(sparkConnector.sendToNats);		
-		
-        // wait for the subscribers to complete.
-        ns1.waitForCompletion();
-    }
-
-    @Test
-    public void testAsyncSparkToNats() throws Exception {   
-    	final List<String> data = getData();
-   	
-        NatsSubscriber ns1 = getNatsSubscriber(data, DEFAULT_SUBJECT);
-        
-		JavaRDD<String> rdd = sc.parallelize(data);
-    	
-    	SparkPubConnector sparkConnector = new SparkPubConnector(DEFAULT_SUBJECT, "sub1", "sub2"); 
-		rdd.foreachAsync(sparkConnector.sendToNats);
-		
-        // wait for the subscribers to complete.
-        ns1.waitForCompletion();
-    }
-
-    @Test
     public void testStaticSparkToNatsNoSubjects() throws Exception {   
     	final List<String> data = getData();
                 

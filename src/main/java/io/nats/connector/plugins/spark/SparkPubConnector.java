@@ -41,12 +41,12 @@ public class SparkPubConnector implements Serializable {
 	 * @param properties
 	 * @param subjects
 	 */
-    public SparkPubConnector() {
+    private SparkPubConnector() {
 		super();
 		logger.debug("CREATE SparkPubConnector: " + this);
 	}
 
-    public SparkPubConnector(Properties properties, String... subjects) {
+    private SparkPubConnector(Properties properties, String... subjects) {
 		super();
 		this.properties = properties;
 		this.subjects = transformIntoAList(subjects);
@@ -56,7 +56,7 @@ public class SparkPubConnector implements Serializable {
 	/**
 	 * @param properties
 	 */
-	public SparkPubConnector(Properties properties) {
+    private SparkPubConnector(Properties properties) {
 		super();
 		this.properties = properties;
 		logger.debug("CREATE SparkPubConnector {} with Properties '{}'.", this, properties);
@@ -65,20 +65,20 @@ public class SparkPubConnector implements Serializable {
 	/**
 	 * @param subjects
 	 */
-	public SparkPubConnector(String... subjects) {
+    private SparkPubConnector(String... subjects) {
 		super();
 		this.subjects = transformIntoAList(subjects);
 		logger.debug("CREATE SparkPubConnector {} with NATS Subjects '{}'.", this, subjects);
 	}
 
-	private Properties getProperties(){
+    protected Properties getProperties(){
     	if (properties == null) {
     		properties = new Properties(System.getProperties());
     	}
     	return properties;
     }
 
-	private Collection<String> getSubjects() throws Exception {
+    protected Collection<String> getSubjects() throws Exception {
 		if ((subjects ==  null) || (subjects.size() == 0)) {
 			final String subjectsStr = getProperties().getProperty(NATS_SUBJECTS);
 			if (subjectsStr == null) {
