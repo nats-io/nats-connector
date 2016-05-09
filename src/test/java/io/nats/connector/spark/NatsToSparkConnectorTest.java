@@ -34,6 +34,7 @@ public class NatsToSparkConnectorTest {
 	static Logger logger = null;
 	static Boolean rightNumber = true;
 	static Boolean atLeastSomeData = false;
+	static String payload = null;
 
 	/**
 	 * @throws java.lang.Exception
@@ -99,6 +100,8 @@ public class NatsToSparkConnectorTest {
 		messages.print();
 		
 		messages.foreachRDD(new VoidFunction<JavaRDD<String>>() {
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void call(JavaRDD<String> rdd) throws Exception {
 				logger.debug("RDD received: {}", rdd.collect());
@@ -109,6 +112,12 @@ public class NatsToSparkConnectorTest {
 				}
 				
 				atLeastSomeData = atLeastSomeData || (count > 0);
+				
+				for (String str :rdd.collect()) {
+					if (! NatsPublisher.NATS_PAYLOAD.equals(str)) {
+							payload = str;
+						}
+				}
 			}			
 		});
 		
@@ -124,6 +133,8 @@ public class NatsToSparkConnectorTest {
 		ssc.close();
 		
 		assertTrue("Not a single RDD did received messages.", atLeastSomeData);
+		
+		assertNull("'" + payload + " should be '" + NatsPublisher.NATS_PAYLOAD + "'",payload);
 	}
 
 }

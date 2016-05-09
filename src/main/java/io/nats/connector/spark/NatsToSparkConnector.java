@@ -82,7 +82,9 @@ public class NatsToSparkConnector extends Receiver<String> {
 			AtomicInteger count = new AtomicInteger();
 			final Subscription sub = nc.subscribe(subject, qgroup, m -> {
 				String s = new String(m.getData());
-				logger.trace("{} Received on {}: {}.", count.incrementAndGet(), m.getSubject(), s);
+				if (logger.isTraceEnabled()) { 
+					logger.trace("{} Received on {}: {}.", count.incrementAndGet(), m.getSubject(), s);
+				}
 				store(s);
 			});
 
@@ -99,6 +101,7 @@ public class NatsToSparkConnector extends Receiver<String> {
 
 			while (true) {
 				// loop forever
+				Thread.yield();
 			}
 		} catch (Exception e) {
 			logger.error(e.getLocalizedMessage());
