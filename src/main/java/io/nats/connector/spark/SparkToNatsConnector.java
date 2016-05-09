@@ -21,6 +21,12 @@ import io.nats.client.Connection;
 import io.nats.client.ConnectionFactory;
 import io.nats.client.Message;
 
+/**
+ * A Spark to NATS connector.
+ * <p>
+ * It provides a VoidFunction&lt;String&gt; methods that can be used as follow:
+ * <pre>rdd.foreach(SparkToNatsConnector.publishToNats());</pre>
+ */
 public class SparkToNatsConnector implements Serializable {
 
 	public static final String NATS_SUBJECTS = "nats.io.connector.spark.subjects";
