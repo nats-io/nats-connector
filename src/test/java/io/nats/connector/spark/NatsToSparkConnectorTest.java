@@ -31,6 +31,8 @@ public class NatsToSparkConnectorTest {
 
 	protected static JavaSparkContext sc;
 	static Logger logger = null;
+	static Boolean rightNumber = true;
+	static Boolean atLeastSomeData = false;
 
 	/**
 	 * @throws java.lang.Exception
@@ -82,6 +84,8 @@ public class NatsToSparkConnectorTest {
 	 */
 	@Test
 	public void testNatsToSparkConnector() throws InterruptedException {
+		final int nbOfMessages = 5;
+		
 		JavaStreamingContext ssc = new JavaStreamingContext(sc, new Duration(200));
 
 		final JavaReceiverInputDStream<String> messages = ssc.receiverStream(
@@ -89,33 +93,36 @@ public class NatsToSparkConnectorTest {
 
 		ExecutorService executor = Executors.newFixedThreadPool(6);
 
-		NatsPublisher   np = new NatsPublisher("np", "Subject",  5);
+		NatsPublisher   np = new NatsPublisher("np", "Subject",  nbOfMessages);
 		
 		messages.print();
 		
 		messages.foreachRDD(new VoidFunction<JavaRDD<String>>() {
 			@Override
-			public void call(JavaRDD<String> t) throws Exception {
-				System.err.println("!!!!!!!!" + t);
+			public void call(JavaRDD<String> rdd) throws Exception {
+				logger.debug("RDD received: {}", rdd.collect());
+				
+				final long count = rdd.count();
+				if ((count != 0) && (count != nbOfMessages)) {
+					rightNumber = false;
+				}
+				
+				atLeastSomeData = atLeastSomeData || (count > 0);
 			}			
 		});
 		
 		ssc.start();
 		
-		NatsSubscriber ns1 = new NatsSubscriber("Subject" + "_id", "Subject", 5);
-
-		// start the subscribers apps
-		executor.execute(ns1);
-
-		// wait for subscribers to be ready.
-		ns1.waitUntilReady();
-
 		Thread.sleep(500);
 		
 		// start the publisher
 		executor.execute(np);
-		
+
+		Thread.sleep(500);
+
 		ssc.close();
+		
+		assertTrue("Not a single RDD did received messages.", atLeastSomeData);
 	}
 
 }
