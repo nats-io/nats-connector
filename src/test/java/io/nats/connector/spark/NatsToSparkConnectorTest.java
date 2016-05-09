@@ -26,26 +26,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class NatsToSparkConnectorTest {
-	
+
 	protected static JavaSparkContext sc;
-    static Logger logger = null;
+	static Logger logger = null;
 
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-        // Enable tracing for debugging as necessary.
-        System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.spark.NatsToSparkConnector", "trace");
-        System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.spark.NatsToSparkConnectorTest", "debug");
-        System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.spark.TestClient", "debug");
+		// Enable tracing for debugging as necessary.
+		System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.spark.NatsToSparkConnector", "trace");
+		System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.spark.NatsToSparkConnectorTest", "debug");
+		System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.spark.TestClient", "debug");
 
-        logger = LoggerFactory.getLogger(NatsToSparkConnectorTest.class);       
+		logger = LoggerFactory.getLogger(NatsToSparkConnectorTest.class);       
 
-        SparkConf sparkConf = new SparkConf().setAppName("My Spark Job").setMaster("local[2]");
+		SparkConf sparkConf = new SparkConf().setAppName("My Spark Job").setMaster("local[2]");
 		sc = new JavaSparkContext(sparkConf);
 
-        UnitTestUtilities.startDefaultServer();
+		UnitTestUtilities.startDefaultServer();
 	}
 
 	/**
@@ -53,8 +53,8 @@ public class NatsToSparkConnectorTest {
 	 */
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
-        UnitTestUtilities.stopDefaultServer();
-        sc.stop();
+		UnitTestUtilities.stopDefaultServer();
+		sc.stop();
 	}
 
 	/**
@@ -79,16 +79,16 @@ public class NatsToSparkConnectorTest {
 	@Test
 	public void testNatsToSparkConnectorStringIntStringString() {
 		JavaStreamingContext ssc = new JavaStreamingContext(sc, new Duration(2000));
-		
+
 		final JavaReceiverInputDStream<String> messages = ssc.receiverStream(
-	    		new NatsToSparkConnector("localhost", 4222, "MeterQueue", "MyGroup"));
+				new NatsToSparkConnector("localhost", 4222, "MeterQueue", "MyGroup"));
 
-        ExecutorService executor = Executors.newFixedThreadPool(6);
+		ExecutorService executor = Executors.newFixedThreadPool(6);
 
-        NatsPublisher   np = new NatsPublisher("np", "Export.Redis",  5);
+		NatsPublisher   np = new NatsPublisher("np", "Export.Redis",  5);
 
-        // start the publisher
-        executor.execute(np);
+		// start the publisher
+		executor.execute(np);
 	}
 
 }

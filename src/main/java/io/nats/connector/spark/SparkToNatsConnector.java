@@ -30,23 +30,23 @@ public class SparkToNatsConnector implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-    protected ConnectionFactory 	connectionFactory = null;
-    protected Connection        	connection        = null;
-    protected Properties			properties		  = null;
-    protected Collection<String>	subjects;
+	protected ConnectionFactory 	connectionFactory = null;
+	protected Connection        	connection        = null;
+	protected Properties			properties		  = null;
+	protected Collection<String>	subjects;
 
-    static final Logger logger = LoggerFactory.getLogger(SparkToNatsConnector.class);
-    
-    /**
+	static final Logger logger = LoggerFactory.getLogger(SparkToNatsConnector.class);
+
+	/**
 	 * @param properties
 	 * @param subjects
 	 */
-    protected SparkToNatsConnector() {
+	protected SparkToNatsConnector() {
 		super();
 		logger.debug("CREATE SparkToNatsConnector: " + this);
 	}
 
-    protected SparkToNatsConnector(Properties properties, String... subjects) {
+	protected SparkToNatsConnector(Properties properties, String... subjects) {
 		super();
 		this.properties = properties;
 		this.subjects = transformIntoAList(subjects);
@@ -56,7 +56,7 @@ public class SparkToNatsConnector implements Serializable {
 	/**
 	 * @param properties
 	 */
-    protected SparkToNatsConnector(Properties properties) {
+	protected SparkToNatsConnector(Properties properties) {
 		super();
 		this.properties = properties;
 		logger.debug("CREATE SparkToNatsConnector {} with Properties '{}'.", this, properties);
@@ -65,20 +65,20 @@ public class SparkToNatsConnector implements Serializable {
 	/**
 	 * @param subjects
 	 */
-    protected SparkToNatsConnector(String... subjects) {
+	protected SparkToNatsConnector(String... subjects) {
 		super();
 		this.subjects = transformIntoAList(subjects);
 		logger.debug("CREATE SparkToNatsConnector {} with NATS Subjects '{}'.", this, subjects);
 	}
 
-    protected Properties getProperties(){
-    	if (properties == null) {
-    		properties = new Properties(System.getProperties());
-    	}
-    	return properties;
-    }
+	protected Properties getProperties(){
+		if (properties == null) {
+			properties = new Properties(System.getProperties());
+		}
+		return properties;
+	}
 
-    protected Collection<String> getSubjects() throws Exception {
+	protected Collection<String> getSubjects() throws Exception {
 		if ((subjects ==  null) || (subjects.size() == 0)) {
 			final String subjectsStr = getProperties().getProperty(NATS_SUBJECTS);
 			if (subjectsStr == null) {
@@ -102,7 +102,7 @@ public class SparkToNatsConnector implements Serializable {
 		}
 		return list;
 	}
-	
+
 	protected ConnectionFactory getConnectionFactory() throws Exception {
 		if (connectionFactory == null) {
 			connectionFactory = new ConnectionFactory(getProperties());
@@ -118,7 +118,7 @@ public class SparkToNatsConnector implements Serializable {
 		}
 		return connection;
 	}
-	
+
 	VoidFunction<String> publishToNats = new VoidFunction<String>() {
 		/**
 		 * 
@@ -128,28 +128,28 @@ public class SparkToNatsConnector implements Serializable {
 		@Override
 		public void call(String str) throws Exception {
 			Message natsMessage = new Message();
-			
+
 			byte[] payload = str.getBytes();
-	        natsMessage.setData(payload, 0, payload.length);
-	        
-            final Connection localConnection = getConnection();
-	        for (String subject : getSubjects()) {
-	            natsMessage.setSubject(subject);
+			natsMessage.setData(payload, 0, payload.length);
+
+			final Connection localConnection = getConnection();
+			for (String subject : getSubjects()) {
+				natsMessage.setSubject(subject);
 				localConnection.publish(natsMessage);
 
-	            logger.trace("Send '{}' from Spark to NATS ({})", str, subject);
-	        }
+				logger.trace("Send '{}' from Spark to NATS ({})", str, subject);
+			}
 		}
 	};
-	
+
 	public static VoidFunction<String> publishToNats(Properties properties, String... subjects) {
 		return new SparkToNatsConnector(properties, subjects).publishToNats;
 	}
-	
+
 	public static VoidFunction<String> publishToNats(Properties properties) {
 		return new SparkToNatsConnector(properties).publishToNats;
 	}
-	
+
 	public static VoidFunction<String> publishToNats(String... subjects) {
 		return new SparkToNatsConnector(subjects).publishToNats;
 	}

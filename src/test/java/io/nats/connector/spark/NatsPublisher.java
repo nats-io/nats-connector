@@ -14,40 +14,40 @@ import io.nats.client.ConnectionFactory;
  */
 class NatsPublisher extends TestClient implements Runnable
 {
-    static final String NATS_PAYLOAD = "Hello from NATS!";
-    
-    String subject = null;
+	static final String NATS_PAYLOAD = "Hello from NATS!";
 
-    NatsPublisher(String id, String subject, int count)
-    {
-        super(id, count);
-        this.subject = subject;
+	String subject = null;
 
-        logger.debug("Creating NATS Publisher ({})", id);
-    }
+	NatsPublisher(String id, String subject, int count)
+	{
+		super(id, count);
+		this.subject = subject;
 
-    @Override
-    public void run() {
+		logger.debug("Creating NATS Publisher ({})", id);
+	}
 
-        try {
+	@Override
+	public void run() {
 
-            logger.debug("NATS Publisher ({}):  Starting", id);
+		try {
 
-            io.nats.client.Connection c = new ConnectionFactory().createConnection();
+			logger.debug("NATS Publisher ({}):  Starting", id);
 
-            for (int i = 0; i < testCount; i++) {
-                c.publish(subject, NATS_PAYLOAD.getBytes());
-                tallyMessage();
-            }
-            c.flush();
+			io.nats.client.Connection c = new ConnectionFactory().createConnection();
 
-            logger.debug("NATS Publisher ({}):  Published {} messages.", id, testCount);
+			for (int i = 0; i < testCount; i++) {
+				c.publish(subject, NATS_PAYLOAD.getBytes());
+				tallyMessage();
+			}
+			c.flush();
 
-            setComplete();
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
-    }
+			logger.debug("NATS Publisher ({}):  Published {} messages.", id, testCount);
+
+			setComplete();
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+		}
+	}
 }
