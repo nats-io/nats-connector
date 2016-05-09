@@ -162,7 +162,7 @@ public class SparkPubPluginTest {
 	protected NatsSubscriber getNatsSubscriber(final List<String> data, String subject) {
 		ExecutorService executor = Executors.newFixedThreadPool(1);
         
-        NatsSubscriber ns1 = new NatsSubscriber("ns1", subject, data.size());
+        NatsSubscriber ns1 = new NatsSubscriber(subject + "_id", subject, data.size());
         
         // start the subscribers apps
         executor.execute(ns1);
@@ -191,17 +191,22 @@ public class SparkPubPluginTest {
     }
 
     @Test
-    public void testStaticSparkToNatsWithSubjects() throws Exception {   
+    public void testStaticSparkToNatsWithMultipleSubjects() throws Exception {   
     	final List<String> data = getData();
     	
-        NatsSubscriber ns1 = getNatsSubscriber(data, DEFAULT_SUBJECT);
+    	String subject1 = "subject1";
+        NatsSubscriber ns1 = getNatsSubscriber(data, subject1);
+                
+    	String subject2 = "subject2";
+        NatsSubscriber ns2 = getNatsSubscriber(data, subject2);
                 
 		JavaRDD<String> rdd = sc.parallelize(data);
     	
-    	rdd.foreach(SparkPubConnector.sendToNats(DEFAULT_SUBJECT, "sub1", "sub2"));		
+    	rdd.foreach(SparkPubConnector.sendToNats(DEFAULT_SUBJECT, subject1, subject2));		
 		
         // wait for the subscribers to complete.
         ns1.waitForCompletion();
+        ns2.waitForCompletion();
     }
 
     @Test
