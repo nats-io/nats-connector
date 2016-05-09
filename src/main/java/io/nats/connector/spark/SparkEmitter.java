@@ -5,7 +5,7 @@
  * which accompanies this distribution, and is available at
  * http://opensource.org/licenses/MIT
  *******************************************************************************/
-package io.nats.connector.plugins.spark;
+package io.nats.connector.spark;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;

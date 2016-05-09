@@ -5,7 +5,7 @@
  * which accompanies this distribution, and is available at
  * http://opensource.org/licenses/MIT
  *******************************************************************************/
-package io.nats.connector.plugins.spark;
+package io.nats.connector.spark;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

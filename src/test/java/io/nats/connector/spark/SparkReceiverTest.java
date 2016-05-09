@@ -5,7 +5,7 @@
  * which accompanies this distribution, and is available at
  * http://opensource.org/licenses/MIT
  *******************************************************************************/
-package io.nats.connector.plugins.spark;
+package io.nats.connector.spark;
 
 import static org.junit.Assert.*;
 
@@ -30,6 +30,7 @@ import io.nats.client.AsyncSubscription;
 import io.nats.client.ConnectionFactory;
 import io.nats.client.Message;
 import io.nats.client.MessageHandler;
+import io.nats.connector.spark.SparkReceiver;
 
 public class SparkReceiverTest {
 
@@ -45,9 +46,9 @@ public class SparkReceiverTest {
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
         // Enable tracing for debugging as necessary.
-        System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.plugins.spark.SparkReceiver", "trace");
-        System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.plugins.spark.SparkReceiverTest", "debug");
-        System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.plugins.spark.TestClient", "debug");
+        System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.spark.SparkReceiver", "trace");
+        System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.spark.SparkReceiverTest", "debug");
+        System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.spark.TestClient", "debug");
 
         logger = LoggerFactory.getLogger(SparkReceiver.class);       
 
