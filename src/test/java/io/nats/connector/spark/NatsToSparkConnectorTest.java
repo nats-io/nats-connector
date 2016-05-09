@@ -134,7 +134,7 @@ public class NatsToSparkConnectorTest {
 		
 		assertTrue("Not a single RDD did received messages.", atLeastSomeData);
 		
-		assertNull("'" + payload + " should be '" + NatsPublisher.NATS_PAYLOAD + "'",payload);
+		assertNull("'" + payload + " should be '" + NatsPublisher.NATS_PAYLOAD + "'", payload);
 	}
 
 }

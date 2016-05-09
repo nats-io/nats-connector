@@ -24,7 +24,7 @@ import io.nats.client.Message;
 /**
  * A Spark to NATS connector.
  * <p>
- * It provides a VoidFunction&lt;String&gt; methods that can be used as follow:
+ * It provides a VoidFunction&lt;String&gt; method that can be used as follow:
  * <pre>rdd.foreach(SparkToNatsConnector.publishToNats());</pre>
  */
 public class SparkToNatsConnector implements Serializable {
@@ -125,17 +125,17 @@ public class SparkToNatsConnector implements Serializable {
 		return connection;
 	}
 
-	VoidFunction<String> publishToNats = new VoidFunction<String>() {
-		/**
-		 * 
-		 */
+	/**
+	 * A VoidFunction&lt;String&gt; method that will publish the provided String into NATS through the defined subjects.
+	 */
+	protected VoidFunction<String> publishToNats = new VoidFunction<String>() {
 		private static final long serialVersionUID = 1L;
 
 		@Override
 		public void call(String str) throws Exception {
-			Message natsMessage = new Message();
+			final Message natsMessage = new Message();
 
-			byte[] payload = str.getBytes();
+			final byte[] payload = str.getBytes();
 			natsMessage.setData(payload, 0, payload.length);
 
 			final Connection localConnection = getConnection();
@@ -148,14 +148,32 @@ public class SparkToNatsConnector implements Serializable {
 		}
 	};
 
+	/**
+	 * Will publish the Strings provided by Spark into NATS.
+	 *
+	 * @param properties Defines the properties of the connection to NATS.
+	 * @param subjects The list of NATS subjects to publish to.
+	 */
 	public static VoidFunction<String> publishToNats(Properties properties, String... subjects) {
 		return new SparkToNatsConnector(properties, subjects).publishToNats;
 	}
 
+	/**
+	 * Will publish the Strings provided by Spark into NATS.
+	 * The list of the NATS subjects (separated by ',') needs to be provided by the nats.io.connector.spark.subjects property.
+	 *
+	 * @param properties Defines the properties of the connection to NATS.
+	 */
 	public static VoidFunction<String> publishToNats(Properties properties) {
 		return new SparkToNatsConnector(properties).publishToNats;
 	}
 
+	/**
+	 * Will publish the Strings provided by Spark into NATS.
+	 * The settings of the NATS connection can be defined thanks to the System properties.
+	 *
+	 * @param subjects The list of NATS subjects to publish to.
+	 */
 	public static VoidFunction<String> publishToNats(String... subjects) {
 		return new SparkToNatsConnector(subjects).publishToNats;
 	}
