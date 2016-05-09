@@ -13,7 +13,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.JavaReceiverInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
@@ -39,6 +41,7 @@ public class NatsToSparkConnectorTest {
 		System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.spark.NatsToSparkConnector", "trace");
 		System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.spark.NatsToSparkConnectorTest", "debug");
 		System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.spark.TestClient", "debug");
+		System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.spark.NatsPublisher", "debug");
 
 		logger = LoggerFactory.getLogger(NatsToSparkConnectorTest.class);       
 
@@ -75,20 +78,44 @@ public class NatsToSparkConnectorTest {
 
 	/**
 	 * Test method for {@link io.nats.connector.spark.NatsToSparkConnector#NatsToSparkConnector(java.lang.String, int, java.lang.String, java.lang.String)}.
+	 * @throws InterruptedException 
 	 */
 	@Test
-	public void testNatsToSparkConnectorStringIntStringString() {
-		JavaStreamingContext ssc = new JavaStreamingContext(sc, new Duration(2000));
+	public void testNatsToSparkConnector() throws InterruptedException {
+		JavaStreamingContext ssc = new JavaStreamingContext(sc, new Duration(200));
 
 		final JavaReceiverInputDStream<String> messages = ssc.receiverStream(
-				new NatsToSparkConnector("localhost", 4222, "MeterQueue", "MyGroup"));
+				new NatsToSparkConnector(null, 0, "Subject", "Subject"));
 
 		ExecutorService executor = Executors.newFixedThreadPool(6);
 
-		NatsPublisher   np = new NatsPublisher("np", "Export.Redis",  5);
+		NatsPublisher   np = new NatsPublisher("np", "Subject",  5);
+		
+		messages.print();
+		
+		messages.foreachRDD(new VoidFunction<JavaRDD<String>>() {
+			@Override
+			public void call(JavaRDD<String> t) throws Exception {
+				System.err.println("!!!!!!!!" + t);
+			}			
+		});
+		
+		ssc.start();
+		
+		NatsSubscriber ns1 = new NatsSubscriber("Subject" + "_id", "Subject", 5);
 
+		// start the subscribers apps
+		executor.execute(ns1);
+
+		// wait for subscribers to be ready.
+		ns1.waitUntilReady();
+
+		Thread.sleep(500);
+		
 		// start the publisher
 		executor.execute(np);
+		
+		ssc.close();
 	}
 
 }

@@ -22,6 +22,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,7 @@ import io.nats.client.Message;
 import io.nats.client.MessageHandler;
 import io.nats.connector.spark.SparkToNatsConnector;
 
+@Ignore
 public class SparkToNatsConnectorTest {
 
 	private static final String DEFAULT_SUBJECT = "spark";
@@ -81,63 +83,6 @@ public class SparkToNatsConnectorTest {
 	public void tearDown() throws Exception {
 	}
 
-	/**
-	 * Simulates a simple NATS subscriber.
-	 */
-	class NatsSubscriber extends TestClient implements Runnable, MessageHandler
-	{
-		String subject = null;
-		boolean checkPayload = true;
-
-		NatsSubscriber(String id, String subject, int count)
-		{
-			super(id, count);
-			this.subject = subject;
-
-			logger.info("Creating NATS Subscriber ({})", id);
-		}
-
-		@Override
-		public void run() {
-
-			try {
-				logger.info("NATS Subscriber ({}):  Subscribing to subject: {}", id, subject); //trace
-
-				io.nats.client.Connection c = new ConnectionFactory().createConnection();
-
-				AsyncSubscription s = c.subscribeAsync(subject, this);
-				s.start();
-
-				setReady();
-
-				logger.info("NATS Subscriber ({}):  Subscribing to subject: {}", id, subject); // debug
-
-				waitForCompletion();
-
-				s.unsubscribe();
-
-				logger.info("NATS Subscriber ({}):  Exiting.", id); // debug
-			}
-			catch (Exception ex)
-			{
-				ex.printStackTrace();
-			}
-		}
-
-		@Override
-		public void onMessage(Message message) {
-
-			String value = new String (message.getData());
-
-			logger.debug("NATS Subscriber ({}):  Received message: {}", id, value);
-
-			if (tallyMessage() == testCount)
-			{
-				logger.info("NATS Subscriber ({}) Received {} messages.  Completed.", id, testCount);
-				setComplete();
-			}
-		}
-	}
 
 	/**
 	 * @return
