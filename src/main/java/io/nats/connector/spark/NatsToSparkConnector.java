@@ -12,6 +12,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.streaming.receiver.Receiver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.nats.client.Connection;
 import io.nats.client.ConnectionFactory;
@@ -23,17 +25,16 @@ public class NatsToSparkConnector extends Receiver<String> {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	/**
-	 * 
-	 */
 	String host = null;
 	int port = -1;	 
 	String subject;
 	String qgroup;
 	String url;
 
-	public NatsToSparkConnector(String host_ , int port_, String _subject, String _qgroup, StorageLevel storageLevel) {
-		super(storageLevel);
+	static final Logger logger = LoggerFactory.getLogger(NatsToSparkConnector.class);
+			
+	public NatsToSparkConnector(String host_ , int port_, String _subject, String _qgroup, StorageLevel _storageLevel) {
+		super(_storageLevel);
 		host = host_;
 		port = port_;
 		subject = _subject;
@@ -49,8 +50,8 @@ public class NatsToSparkConnector extends Receiver<String> {
 	}
 
 
-	public NatsToSparkConnector(StorageLevel storageLevel) {
-		super(storageLevel);
+	public NatsToSparkConnector(StorageLevel _storageLevel) {
+		super(_storageLevel);
 	}
 
 	public void onStart() {
@@ -60,8 +61,7 @@ public class NatsToSparkConnector extends Receiver<String> {
 				try {
 					receive();
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.error("Cannot start the connector: ", e);
 				}
 			}
 		}.start();
@@ -82,19 +82,17 @@ public class NatsToSparkConnector extends Receiver<String> {
 			AtomicInteger count = new AtomicInteger();
 			final Subscription sub = nc.subscribe(subject, qgroup, m -> {
 				String s = new String(m.getData());
-				System.out.printf("[#%d] Received on [%s]: '%s'\n", count.incrementAndGet(),
-						m.getSubject(), s);
-
+				logger.trace("{} Received on {}: {}.", count.incrementAndGet(), m.getSubject(), s);
 				store(s);
 			});
 
-			System.out.printf("Listening on [%s]\n", subject);
+			logger.info("Listening on {}.", subject);
 			Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-				System.err.println("\nCaught CTRL-C, shutting down gracefully...\n");
+				logger.error("Caught CTRL-C, shutting down gracefully...");
 				try {
 					sub.unsubscribe();
 				} catch (IOException e) {
-					System.out.println("Problem unsubscribing " + e.toString());
+					logger.error("Problem while unsubscribing " + e.toString());
 				}
 				nc.close();
 			}));
@@ -103,8 +101,7 @@ public class NatsToSparkConnector extends Receiver<String> {
 				// loop forever
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 		}			        				
 	}
 }
