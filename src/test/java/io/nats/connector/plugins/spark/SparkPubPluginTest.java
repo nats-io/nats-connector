@@ -47,6 +47,7 @@ public class SparkPubPluginTest {
         // Enable tracing for debugging as necessary.
         System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.plugins.spark.SparkPubConnector", "trace");
         System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.plugins.spark.SparkPubPluginTest", "debug");
+        System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.plugins.spark.TestClient", "debug");
 
         logger = LoggerFactory.getLogger(SparkPubConnector.class);       
 
@@ -80,95 +81,6 @@ public class SparkPubPluginTest {
 	@After
 	public void tearDown() throws Exception {
 	}
-	
-    abstract class TestClient
-    {
-        Object readyLock = new Object();
-        boolean isReady = false;
-
-        String id = "";
-
-        Object completeLock = new Object();
-        boolean isComplete = false;
-
-        protected int testCount = 0;
-
-        int msgCount = 0;
-
-        int tallyMessage()
-        {
-            return (++msgCount);
-        }
-
-        int getMessageCount()
-        {
-            return msgCount;
-        }
-
-        TestClient(String id, int testCount)
-        {
-            this.id = id;
-            this.testCount = testCount;
-        }
-
-        void setReady()
-        {
-            logger.debug("Client ({}) is ready.", id);
-            synchronized (readyLock)
-            {
-                if (isReady)
-                    return;
-
-                isReady = true;
-                readyLock.notifyAll();
-            }
-        }
-
-        void waitUntilReady()
-        {
-            synchronized (readyLock)
-            {
-                while (!isReady) {
-                    try {
-                        readyLock.wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-            logger.debug("Done waiting for Client ({}) to be ready.", id);
-        }
-
-        void setComplete()
-        {
-            logger.debug("Client ({}) has completed.", id);
-
-            synchronized(completeLock)
-            {
-                if (isComplete)
-                    return;
-
-                isComplete = true;
-                completeLock.notifyAll();
-            }
-        }
-
-        void waitForCompletion()
-        {
-            synchronized (completeLock)
-            {
-                while (!isComplete)
-                {
-                    try {
-                        completeLock.wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-            logger.debug("Done waiting for Client ({}) to complete.", id);
-        }
-    }
 
     /**
      * Simulates a simple NATS subscriber.
