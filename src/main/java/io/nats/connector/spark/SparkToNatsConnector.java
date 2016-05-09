@@ -21,7 +21,7 @@ import io.nats.client.Connection;
 import io.nats.client.ConnectionFactory;
 import io.nats.client.Message;
 
-public class SparkReceiver implements Serializable {
+public class SparkToNatsConnector implements Serializable {
 
 	public static final String NATS_SUBJECTS = "nats.io.connector.spark.subjects";
 
@@ -35,40 +35,40 @@ public class SparkReceiver implements Serializable {
     protected Properties			properties		  = null;
     protected Collection<String>	subjects;
 
-    static final Logger logger = LoggerFactory.getLogger(SparkReceiver.class);
+    static final Logger logger = LoggerFactory.getLogger(SparkToNatsConnector.class);
     
     /**
 	 * @param properties
 	 * @param subjects
 	 */
-    protected SparkReceiver() {
+    protected SparkToNatsConnector() {
 		super();
-		logger.debug("CREATE SparkReceiver: " + this);
+		logger.debug("CREATE SparkToNatsConnector: " + this);
 	}
 
-    protected SparkReceiver(Properties properties, String... subjects) {
+    protected SparkToNatsConnector(Properties properties, String... subjects) {
 		super();
 		this.properties = properties;
 		this.subjects = transformIntoAList(subjects);
-		logger.debug("CREATE SparkReceiver {} with Properties '{}' and NATS Subjects '{}'.", this, properties, subjects);
+		logger.debug("CREATE SparkToNatsConnector {} with Properties '{}' and NATS Subjects '{}'.", this, properties, subjects);
 	}
 
 	/**
 	 * @param properties
 	 */
-    protected SparkReceiver(Properties properties) {
+    protected SparkToNatsConnector(Properties properties) {
 		super();
 		this.properties = properties;
-		logger.debug("CREATE SparkReceiver {} with Properties '{}'.", this, properties);
+		logger.debug("CREATE SparkToNatsConnector {} with Properties '{}'.", this, properties);
 	}
 
 	/**
 	 * @param subjects
 	 */
-    protected SparkReceiver(String... subjects) {
+    protected SparkToNatsConnector(String... subjects) {
 		super();
 		this.subjects = transformIntoAList(subjects);
-		logger.debug("CREATE SparkReceiver {} with NATS Subjects '{}'.", this, subjects);
+		logger.debug("CREATE SparkToNatsConnector {} with NATS Subjects '{}'.", this, subjects);
 	}
 
     protected Properties getProperties(){
@@ -82,7 +82,7 @@ public class SparkReceiver implements Serializable {
 		if ((subjects ==  null) || (subjects.size() == 0)) {
 			final String subjectsStr = getProperties().getProperty(NATS_SUBJECTS);
 			if (subjectsStr == null) {
-				throw new Exception("SparkReceiver needs at least one NATS Subject.");
+				throw new Exception("SparkToNatsConnector needs at least one NATS Subject.");
 			}
 			final String[] subjectsArray = subjectsStr.split(",");
 			subjects = transformIntoAList(subjectsArray);
@@ -143,15 +143,15 @@ public class SparkReceiver implements Serializable {
 	};
 	
 	public static VoidFunction<String> publishToNats(Properties properties, String... subjects) {
-		return new SparkReceiver(properties, subjects).publishToNats;
+		return new SparkToNatsConnector(properties, subjects).publishToNats;
 	}
 	
 	public static VoidFunction<String> publishToNats(Properties properties) {
-		return new SparkReceiver(properties).publishToNats;
+		return new SparkToNatsConnector(properties).publishToNats;
 	}
 	
 	public static VoidFunction<String> publishToNats(String... subjects) {
-		return new SparkReceiver(subjects).publishToNats;
+		return new SparkToNatsConnector(subjects).publishToNats;
 	}
 
 }

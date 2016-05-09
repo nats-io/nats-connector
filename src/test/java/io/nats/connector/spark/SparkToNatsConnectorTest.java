@@ -30,9 +30,9 @@ import io.nats.client.AsyncSubscription;
 import io.nats.client.ConnectionFactory;
 import io.nats.client.Message;
 import io.nats.client.MessageHandler;
-import io.nats.connector.spark.SparkReceiver;
+import io.nats.connector.spark.SparkToNatsConnector;
 
-public class SparkReceiverTest {
+public class SparkToNatsConnectorTest {
 
 	private static final String DEFAULT_SUBJECT = "spark";
 
@@ -46,11 +46,11 @@ public class SparkReceiverTest {
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
         // Enable tracing for debugging as necessary.
-        System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.spark.SparkReceiver", "trace");
-        System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.spark.SparkReceiverTest", "debug");
+        System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.spark.SparkToNatsConnector", "trace");
+        System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.spark.SparkToNatsConnectorTest", "debug");
         System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.spark.TestClient", "debug");
 
-        logger = LoggerFactory.getLogger(SparkReceiver.class);       
+        logger = LoggerFactory.getLogger(SparkToNatsConnector.class);       
 
         SparkConf sparkConf = new SparkConf().setAppName("My Spark Job").setMaster("local[2]");
 		sc = new JavaSparkContext(sparkConf);
@@ -73,7 +73,7 @@ public class SparkReceiverTest {
 	@Before
 	public void setUp() throws Exception {
 		assertTrue(logger.isDebugEnabled());
-		assertTrue(LoggerFactory.getLogger(SparkReceiver.class).isTraceEnabled());
+		assertTrue(LoggerFactory.getLogger(SparkToNatsConnector.class).isTraceEnabled());
 	}
 
 	/**
@@ -180,15 +180,15 @@ public class SparkReceiverTest {
 		JavaRDD<String> rdd = sc.parallelize(data);
     	
     	try {
-			rdd.foreach(SparkReceiver.publishToNats());
+			rdd.foreach(SparkToNatsConnector.publishToNats());
 		} catch (Exception e) {
-			if (e.getMessage().contains("SparkReceiver needs at least one NATS Subject"))
+			if (e.getMessage().contains("SparkToNatsConnector needs at least one NATS Subject"))
 				return;
 			else
 				throw e;
 		}	
     	
-    	fail("An Exception(\"SparkReceiver needs at least one Subject\") should have been raised.");
+    	fail("An Exception(\"SparkToNatsConnector needs at least one Subject\") should have been raised.");
     }
 
     @Test
@@ -203,7 +203,7 @@ public class SparkReceiverTest {
                 
 		JavaRDD<String> rdd = sc.parallelize(data);
     	
-    	rdd.foreach(SparkReceiver.publishToNats(DEFAULT_SUBJECT, subject1, subject2));		
+    	rdd.foreach(SparkToNatsConnector.publishToNats(DEFAULT_SUBJECT, subject1, subject2));		
 		
         // wait for the subscribers to complete.
         ns1.waitForCompletion();
@@ -219,8 +219,8 @@ public class SparkReceiverTest {
 		JavaRDD<String> rdd = sc.parallelize(data);
     	
     	final Properties properties = new Properties();
-    	properties.setProperty(SparkReceiver.NATS_SUBJECTS, "sub1,"+DEFAULT_SUBJECT+" , sub2");
-		rdd.foreach(SparkReceiver.publishToNats(properties));		
+    	properties.setProperty(SparkToNatsConnector.NATS_SUBJECTS, "sub1,"+DEFAULT_SUBJECT+" , sub2");
+		rdd.foreach(SparkToNatsConnector.publishToNats(properties));		
 		
         // wait for the subscribers to complete.
         ns1.waitForCompletion();
@@ -234,14 +234,14 @@ public class SparkReceiverTest {
                 
 		JavaRDD<String> rdd = sc.parallelize(data);
     	
-    	System.setProperty(SparkReceiver.NATS_SUBJECTS, "sub1,"+DEFAULT_SUBJECT+" , sub2");
+    	System.setProperty(SparkToNatsConnector.NATS_SUBJECTS, "sub1,"+DEFAULT_SUBJECT+" , sub2");
     	
     	try {
-			rdd.foreach(SparkReceiver.publishToNats());
+			rdd.foreach(SparkToNatsConnector.publishToNats());
 			// wait for the subscribers to complete.
 			ns1.waitForCompletion();
 		} finally {
-			System.clearProperty(SparkReceiver.NATS_SUBJECTS);
+			System.clearProperty(SparkToNatsConnector.NATS_SUBJECTS);
 		}		
     }
 }
