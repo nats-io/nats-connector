@@ -16,6 +16,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.VoidFunction;
+import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.JavaReceiverInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
@@ -89,7 +90,7 @@ public class NatsToSparkConnectorTest {
 		JavaStreamingContext ssc = new JavaStreamingContext(sc, new Duration(200));
 
 		final JavaReceiverInputDStream<String> messages = ssc.receiverStream(
-				new NatsToSparkConnector(null, 0, "Subject", "Subject"));
+				new NatsToSparkConnector(null, 0, "Subject", "Subject", StorageLevel.MEMORY_ONLY()));
 
 		ExecutorService executor = Executors.newFixedThreadPool(6);
 

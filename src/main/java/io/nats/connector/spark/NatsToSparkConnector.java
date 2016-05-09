@@ -19,6 +19,9 @@ import io.nats.client.Subscription;
 
 public class NatsToSparkConnector extends Receiver<String> {
 
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = 1L;
 	/**
 	 * 
@@ -29,8 +32,8 @@ public class NatsToSparkConnector extends Receiver<String> {
 	String qgroup;
 	String url;
 
-	public NatsToSparkConnector(String host_ , int port_, String _subject, String _qgroup) {
-		super(StorageLevel.MEMORY_AND_DISK_2());
+	public NatsToSparkConnector(String host_ , int port_, String _subject, String _qgroup, StorageLevel storageLevel) {
+		super(storageLevel);
 		host = host_;
 		port = port_;
 		subject = _subject;
@@ -46,8 +49,8 @@ public class NatsToSparkConnector extends Receiver<String> {
 	}
 
 
-	public NatsToSparkConnector() {
-		super(StorageLevel.MEMORY_AND_DISK_2());
+	public NatsToSparkConnector(StorageLevel storageLevel) {
+		super(storageLevel);
 	}
 
 	public void onStart() {
