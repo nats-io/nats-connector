@@ -88,9 +88,7 @@ public class NatsToSparkConnector extends Receiver<String> {
 		// is designed to stop by itself if CTRL-C is Caught.
 	}
 
-	/** Create a socket connection and receive data until receiver is stopped 
-	 * @throws TimeoutException 
-	 * @throws IOException */
+	/** Create a socket connection and receive data until receiver is stopped **/
 	protected void receive() {
 
 		try {
