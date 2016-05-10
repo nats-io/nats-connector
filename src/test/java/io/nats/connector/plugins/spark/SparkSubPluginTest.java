@@ -5,9 +5,10 @@
  * which accompanies this distribution, and is available at
  * http://opensource.org/licenses/MIT
  *******************************************************************************/
-package io.nats.connector.spark;
+package io.nats.connector.plugins.spark;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -24,14 +25,18 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.nats.connector.spark.NatsToSparkConnector;
 
-@Ignore
-public class NatsToSparkConnectorTest {
+import io.nats.connector.spark.NatsPublisher;
+import io.nats.connector.spark.UnitTestUtilities;
+
+/**
+ * @author laugimethods
+ *
+ */
+public class SparkSubPluginTest {
 
 	protected static JavaSparkContext sc;
 	static Logger logger = null;
@@ -45,12 +50,12 @@ public class NatsToSparkConnectorTest {
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		// Enable tracing for debugging as necessary.
-		System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.spark.NatsToSparkConnector", "trace");
-		System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.spark.NatsToSparkConnectorTest", "debug");
-		System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.spark.TestClient", "debug");
+		System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.plugins.spark.SparkConnector", "trace");
+		System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.plugins.spark.SparkSubPlugin", "debug");
+		System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.plugins.spark.SparkSubPluginTest", "debug");
 		System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.spark.NatsPublisher", "debug");
 
-		logger = LoggerFactory.getLogger(NatsToSparkConnectorTest.class);       
+		logger = LoggerFactory.getLogger(SparkSubPluginTest.class);       
 
 		SparkConf sparkConf = new SparkConf().setAppName("My Spark Job").setMaster("local[2]");
 		sc = new JavaSparkContext(sparkConf);
@@ -73,7 +78,7 @@ public class NatsToSparkConnectorTest {
 	@Before
 	public void setUp() throws Exception {
 		assertTrue(logger.isDebugEnabled());
-		assertTrue(LoggerFactory.getLogger(NatsToSparkConnector.class).isTraceEnabled());
+		assertTrue(LoggerFactory.getLogger(SparkConnector.class).isTraceEnabled());
 	}
 
 	/**
@@ -88,13 +93,13 @@ public class NatsToSparkConnectorTest {
 	 * @throws InterruptedException 
 	 */
 	@Test
-	public void testNatsToSparkConnector() throws InterruptedException {
+	public void testNatsToSparkPlugin() throws InterruptedException {
 		final int nbOfMessages = 5;
 		
 		JavaStreamingContext ssc = new JavaStreamingContext(sc, new Duration(200));
 
 		final JavaReceiverInputDStream<String> messages = ssc.receiverStream(
-				new NatsToSparkConnector(null, 0, "Subject", "Group", StorageLevel.MEMORY_ONLY()));
+				SparkConnector.createSparkConnector(StorageLevel.MEMORY_ONLY(), "Subject"));
 
 		ExecutorService executor = Executors.newFixedThreadPool(6);
 

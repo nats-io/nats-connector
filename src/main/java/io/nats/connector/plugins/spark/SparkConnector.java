@@ -38,12 +38,17 @@ public class SparkConnector extends Receiver<String> {
 		super(storageLevel);		
 	}
 
-	public static SparkConnector createSparkConnector() {
-		SparkConnector instance = new SparkConnector(StorageLevel.MEMORY_ONLY());
+	public static SparkConnector createSparkConnector(StorageLevel storageLevel, String subjectFrom) {
+		SparkConnector instance = new SparkConnector(storageLevel, subjectFrom);
 		weakInstancesSet.add(new WeakReference<SparkConnector>(instance));
 		return instance;
 	}
 	
+	protected SparkConnector(StorageLevel storageLevel, String subjectFrom) {
+		super(storageLevel);
+		this.subjectFrom = subjectFrom;
+	}
+
 	public static Set<WeakReference<SparkConnector>> getInstances() {
 	    return weakInstancesSet;
 	}

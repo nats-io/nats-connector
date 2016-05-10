@@ -12,13 +12,13 @@ import io.nats.client.ConnectionFactory;
 /**
  * Simulates a simple NATS publisher.
  */
-class NatsPublisher extends TestClient implements Runnable
+public class NatsPublisher extends TestClient implements Runnable
 {
-	static final String NATS_PAYLOAD = "Hello from NATS!";
+	public static final String NATS_PAYLOAD = "Hello from NATS!";
 
 	String subject = null;
 
-	NatsPublisher(String id, String subject, int count)
+	public NatsPublisher(String id, String subject, int count)
 	{
 		super(id, count);
 		this.subject = subject;
