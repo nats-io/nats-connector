@@ -7,6 +7,8 @@
  *******************************************************************************/
 package io.nats.connector.plugins.spark;
 
+import java.lang.ref.WeakReference;
+
 import org.slf4j.Logger;
 
 import io.nats.client.ConnectionFactory;
@@ -19,7 +21,9 @@ public class SparkSubPlugin implements NATSConnectorPlugin {
 
 	@Override
 	public boolean onStartup(Logger logger, ConnectionFactory factory) {
-		// TODO Auto-generated method stub
+		for (WeakReference<SparkConnector> sparkConnector: SparkConnector.getInstances()) {
+			sparkConnector.get().setFactory(factory);
+		}
 		return false;
 	}
 
