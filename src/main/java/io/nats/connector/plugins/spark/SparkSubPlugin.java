@@ -19,36 +19,42 @@ import io.nats.connector.plugin.NATSEvent;
 
 public class SparkSubPlugin implements NATSConnectorPlugin {
 
+    Logger logger = null;
+
 	@Override
 	public boolean onStartup(Logger logger, ConnectionFactory factory) {
-		for (WeakReference<SparkConnector> sparkConnector: SparkConnector.getInstances()) {
-			sparkConnector.get().setFactory(factory);
-		}
-		return true;
+        this.logger = logger;
+
+        try {
+			for (WeakReference<SparkConnector> sparkConnector: SparkConnector.getInstances()) {
+				sparkConnector.get().setFactory(factory);
+			}
+        }
+        catch (Exception e) {
+            logger.error("Unable to initialize.", e);
+            return false;
+        }
+
+        return true;
 	}
 
 	@Override
 	public boolean onNatsInitialized(NATSConnector connector) {
-		// TODO Auto-generated method stub
-		return true;
+		// This plugin doesn't need to continue
+		return false;
 	}
 
 	@Override
 	public void onNATSMessage(Message msg) {
-		// TODO Auto-generated method stub
-		
+		logger.trace("Received message: {}.", msg);
 	}
 
 	@Override
 	public void onNATSEvent(NATSEvent event, String message) {
-		// TODO Auto-generated method stub
-		
+		logger.trace("Received event {} with message: {}.", event, message);
 	}
 
 	@Override
 	public void onShutdown() {
-		// TODO Auto-generated method stub
-		
 	}
-
 }

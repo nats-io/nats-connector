@@ -33,10 +33,6 @@ import io.nats.connector.Connector;
 import io.nats.connector.spark.NatsPublisher;
 import io.nats.connector.spark.UnitTestUtilities;
 
-/**
- * @author laugimethods
- *
- */
 public class SparkSubPluginTest {
 
 	protected static JavaSparkContext sc;
@@ -53,9 +49,10 @@ public class SparkSubPluginTest {
 		System.setProperty(Connector.PLUGIN_CLASS, SparkSubPlugin.class.getName());
 
 		// Enable tracing for debugging as necessary.
+//		System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "warn");
 		System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.Connector", "debug");
 		System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.plugins.spark.SparkConnector", "trace");
-		System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.plugins.spark.SparkSubPlugin", "debug");
+		System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.plugins.spark.SparkSubPlugin", "trace");
 		System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.plugins.spark.SerializableConnectionFactory", "debug");
 		System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.plugins.spark.SparkSubPluginTest", "debug");
 		System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.spark.NatsPublisher", "debug");
