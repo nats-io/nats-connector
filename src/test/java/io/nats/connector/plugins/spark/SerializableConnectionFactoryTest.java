@@ -1,6 +1,10 @@
-/**
- * 
- */
+/*******************************************************************************
+ * Copyright (c) 2016 Logimethods
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the MIT License (MIT)
+ * which accompanies this distribution, and is available at
+ * http://opensource.org/licenses/MIT
+ *******************************************************************************/
 package io.nats.connector.plugins.spark;
 
 import static org.junit.Assert.*;
@@ -14,12 +18,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import io.nats.client.ConnectionFactory;
+
 import static io.nats.client.Constants.PROP_URL;
 
-/**
- * @author laugimethods
- *
- */
 public class SerializableConnectionFactoryTest {
 
 	/**
@@ -65,6 +67,15 @@ public class SerializableConnectionFactoryTest {
 		SerializableConnectionFactory original = new SerializableConnectionFactory(prop);
 		SerializableConnectionFactory copy = SerializationUtils.clone(original);
 		assertEquals(original.getUrlString(), copy.getUrlString());
+	}
+
+	@Test
+	public void testSerializeFromNonSerializableFactory() {
+		String url = "nats://192.168.2.3:9090";
+		ConnectionFactory nonSerializable = new ConnectionFactory(url);
+		SerializableConnectionFactory original = new SerializableConnectionFactory(nonSerializable);
+		SerializableConnectionFactory copy = SerializationUtils.clone(original);
+		assertEquals(nonSerializable.getUrlString(), copy.getUrlString());
 	}
 
 }

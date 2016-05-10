@@ -1,6 +1,10 @@
-/**
- * 
- */
+/*******************************************************************************
+ * Copyright (c) 2016 Logimethods
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the MIT License (MIT)
+ * which accompanies this distribution, and is available at
+ * http://opensource.org/licenses/MIT
+ *******************************************************************************/
 package io.nats.connector.plugins.spark;
 
 import static io.nats.client.Constants.PROP_CLOSED_CB;
@@ -87,6 +91,18 @@ public class SerializableConnectionFactory extends ConnectionFactory implements 
 	 */
 	public SerializableConnectionFactory(ConnectionFactory cf) {
 		super(cf);
+		_props = new Properties();		
+		// PROP_URL
+        _props.setProperty(PROP_URL, cf.getUrlString());        
+        // PROP_HOST
+        _props.setProperty(PROP_HOST, cf.getHost());
+        // PROP_PORT
+        _props.setProperty(PROP_PORT, Integer.toString(cf.getPort()));
+        // PROP_SERVERS
+        if (cf.getServers() != null)
+        	_props.setProperty(PROP_SERVERS, cf.getServers().toString());
+        
+        // ... //		
 	}
 
 	/**
