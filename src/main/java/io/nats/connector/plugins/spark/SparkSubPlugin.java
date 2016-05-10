@@ -24,13 +24,13 @@ public class SparkSubPlugin implements NATSConnectorPlugin {
 		for (WeakReference<SparkConnector> sparkConnector: SparkConnector.getInstances()) {
 			sparkConnector.get().setFactory(factory);
 		}
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean onNatsInitialized(NATSConnector connector) {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override

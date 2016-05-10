@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.nats.connector.Connector;
 import io.nats.connector.spark.NatsPublisher;
 import io.nats.connector.spark.UnitTestUtilities;
 
@@ -48,10 +49,14 @@ public class SparkSubPluginTest {
 	 * @throws java.lang.Exception
 	 */
 	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
+	public static void setUpBeforeClass() throws Exception {		
+		System.setProperty(Connector.PLUGIN_CLASS, SparkSubPlugin.class.getName());
+
 		// Enable tracing for debugging as necessary.
+		System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.Connector", "debug");
 		System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.plugins.spark.SparkConnector", "trace");
 		System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.plugins.spark.SparkSubPlugin", "debug");
+		System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.plugins.spark.SerializableConnectionFactory", "debug");
 		System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.plugins.spark.SparkSubPluginTest", "debug");
 		System.setProperty("org.slf4j.simpleLogger.log.io.nats.connector.spark.NatsPublisher", "debug");
 
@@ -90,11 +95,13 @@ public class SparkSubPluginTest {
 
 	/**
 	 * Test method for {@link io.nats.connector.spark.NatsToSparkConnector#NatsToSparkConnector(java.lang.String, int, java.lang.String, java.lang.String)}.
-	 * @throws InterruptedException 
+	 * @throws Exception 
 	 */
 	@Test
-	public void testNatsToSparkPlugin() throws InterruptedException {
+	public void testNatsToSparkPlugin() throws Exception {
 		final int nbOfMessages = 5;
+		
+		Connector c = new Connector();
 		
 		JavaStreamingContext ssc = new JavaStreamingContext(sc, new Duration(200));
 
@@ -128,7 +135,10 @@ public class SparkSubPluginTest {
 				}
 			}			
 		});
-		
+
+        // start the connector
+        executor.execute(c);
+
 		ssc.start();
 		
 		Thread.sleep(500);

@@ -39,6 +39,9 @@ import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.nats.client.ClosedCallback;
 import io.nats.client.ConnectionFactory;
 import io.nats.client.DisconnectedCallback;
@@ -55,6 +58,8 @@ public class SerializableConnectionFactory extends ConnectionFactory implements 
 	protected String[] _servers;
 	protected Properties _props;
 
+	static final Logger logger = LoggerFactory.getLogger(SerializableConnectionFactory.class);
+			
 	/**
 	 * 
 	 */
@@ -93,16 +98,28 @@ public class SerializableConnectionFactory extends ConnectionFactory implements 
 		super(cf);
 		_props = new Properties();		
 		// PROP_URL
-        _props.setProperty(PROP_URL, cf.getUrlString());        
+		if (cf.getUrlString() != null) {
+			_props.setProperty(PROP_URL, cf.getUrlString());  
+		}
+              
         // PROP_HOST
-        _props.setProperty(PROP_HOST, cf.getHost());
+		if (cf.getHost() != null) {
+			_props.setProperty(PROP_HOST, cf.getHost());
+		}
+		
         // PROP_PORT
-        _props.setProperty(PROP_PORT, Integer.toString(cf.getPort()));
+		if (cf.getPort() != -1) {
+			_props.setProperty(PROP_PORT, Integer.toString(cf.getPort()));
+		}
+        
         // PROP_SERVERS
-        if (cf.getServers() != null)
+        if (cf.getServers() != null) {
         	_props.setProperty(PROP_SERVERS, cf.getServers().toString());
+        }
         
         // ... //		
+        
+        logger.debug("Properties : {}", _props);
 	}
 
 	/**

@@ -10,11 +10,9 @@ package io.nats.connector.plugins.spark;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.streaming.receiver.Receiver;
@@ -73,9 +71,14 @@ public class SparkConnector extends Receiver<String> {
 		// is designed to stop by itself if CTRL-C is Caught.
 	}
 	
-	/** Create a socket connection and receive data until receiver is stopped **/
-	protected void receive() {
+	/** Create a socket connection and receive data until receiver is stopped 
+	 * @throws Exception **/
+	protected void receive() throws Exception {
 
+		if (factory == null) {
+			throw new Exception("The NATS Connection Factory has not been set.");
+		}
+		
 		try {
 			// Make connection and initialize streams			  
 			final Connection nc = factory.createConnection();
