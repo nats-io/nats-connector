@@ -17,6 +17,7 @@ import io.nats.connector.plugin.NATSConnector;
 import io.nats.connector.plugin.NATSConnectorPlugin;
 import io.nats.connector.plugin.NATSEvent;
 
+@Deprecated
 public class SparkSubPlugin implements NATSConnectorPlugin {
 
     Logger logger = null;

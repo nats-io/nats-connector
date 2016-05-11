@@ -23,6 +23,7 @@ import io.nats.client.Connection;
 import io.nats.client.ConnectionFactory;
 import io.nats.client.Subscription;
 
+@Deprecated
 public class SparkConnector extends Receiver<String> {
 	
 	private static Set<WeakReference<SparkConnector>> weakInstancesSet = Collections.newSetFromMap(new WeakHashMap<WeakReference<SparkConnector>, Boolean>());

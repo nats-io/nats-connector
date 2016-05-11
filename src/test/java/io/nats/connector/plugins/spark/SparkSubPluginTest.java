@@ -25,6 +25,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,8 @@ import io.nats.connector.Connector;
 import io.nats.connector.spark.NatsPublisher;
 import io.nats.connector.spark.UnitTestUtilities;
 
+@Deprecated
+@Ignore
 public class SparkSubPluginTest {
 
 	protected static JavaSparkContext sc;

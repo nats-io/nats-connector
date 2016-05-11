@@ -16,12 +16,15 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import io.nats.client.ConnectionFactory;
 
 import static io.nats.client.Constants.PROP_URL;
 
+@Deprecated
+@Ignore
 public class SerializableConnectionFactoryTest {
 
 	/**

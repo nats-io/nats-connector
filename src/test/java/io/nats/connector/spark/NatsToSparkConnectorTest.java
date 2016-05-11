@@ -30,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.nats.connector.spark.NatsToSparkConnector;
 
-@Ignore
 public class NatsToSparkConnectorTest {
 
 	protected static JavaSparkContext sc;
