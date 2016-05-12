@@ -48,10 +48,7 @@ import io.nats.client.DisconnectedCallback;
 import io.nats.client.ExceptionHandler;
 import io.nats.client.ReconnectedCallback;
 
-/**
- * @author laugimethods
- *
- */
+@Deprecated
 public class SerializableConnectionFactory extends ConnectionFactory implements Serializable {
 	
 	protected String _url;
