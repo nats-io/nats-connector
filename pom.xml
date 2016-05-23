@@ -23,6 +23,10 @@
         <name>Apcera, Inc.</name>
     </organization>
     
+     <properties>
+        <spark.version>1.6.1</spark.version>
+    </properties>
+    
     <dependencies>
         <dependency>
             <groupId>io.nats</groupId>
@@ -34,6 +38,17 @@
             <artifactId>slf4j-simple</artifactId>
             <version>1.7.5</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-core_2.10</artifactId>
+            <version>${spark.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-streaming_2.10</artifactId>
+            <version>${spark.version}</version>
+        </dependency>   
     </dependencies>
 
     <scm>
